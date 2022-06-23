@@ -11,6 +11,11 @@ namespace MyHttpClientProject.Parsers
     {
         public static HttpResponse ParseFromBytes(byte[] data)
         {
+            if (data == null || data.Length == 0)
+            {
+                throw new ArgumentException("Data should not be null or empty", nameof(data));
+            }
+
             var dataStringArray = Encoding.UTF8.GetString(data).Split(Environment.NewLine);
 
             var result = new HttpResponse
@@ -19,12 +24,9 @@ namespace MyHttpClientProject.Parsers
                 ResponseHeaders = GetHeaders(dataStringArray)
             };
 
-            if (result.ResponseHeaders.TryGetValue("Content-Length", out var value))
+            if (result.ResponseHeaders.TryGetValue("Content-Length", out var value) && int.TryParse(value, out var parsedValue))
             {
-                if (int.TryParse(value, out var parsedValue))
-                {
-                    result.ResponseBody = GetBody(data, parsedValue);
-                }
+                result.ResponseBody = data.TakeLast(parsedValue).ToArray();
             }
 
             return result;
@@ -45,10 +47,8 @@ namespace MyHttpClientProject.Parsers
             return statusCode;
         }
 
-        private static Dictionary<string, string> GetHeaders(IEnumerable<string> data)
+        private static IDictionary<string, string> GetHeaders(IEnumerable<string> data)
         {
-            const char separator = ':';
-
             var result = new Dictionary<string, string>();
 
             var headers = data
@@ -61,6 +61,8 @@ namespace MyHttpClientProject.Parsers
                 throw new FormatException("No headers found");
             }
 
+            const char separator = ':';
+
             foreach (var line in headers)
             {
                 int separatorIndex = line.IndexOf(separator, StringComparison.Ordinal);
@@ -70,16 +72,13 @@ namespace MyHttpClientProject.Parsers
                     throw new FormatException($"Invalid header found: {line}");
                 }
 
-                var name = line[..separatorIndex];
-                var value = line[(separatorIndex + 2)..];
+                var name = line[..separatorIndex].Trim();
+                var value = line[(separatorIndex + 2)..].Trim();
 
                 result.Add(name, value);
             }
 
             return result;
         }
-
-        private static IEnumerable<byte> GetBody(IEnumerable<byte> data, int bodyLength) => data.TakeLast(bodyLength).ToArray();
-
     }
 }

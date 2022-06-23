@@ -3,16 +3,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using MyHttpClientProject;
 using MyHttpClientProject.Builders;
-using MyHttpClientProject.Extensions;
+using MyHttpClientProject.WebConnection;
 
 namespace AppForUsingClient
 {
     public class Program
     {
+
         static async Task Main(string[] args)
         {
             using var client = new MyHttpClient();
@@ -20,12 +20,10 @@ namespace AppForUsingClient
 
             var request = builder
                 .SetMethod(HttpMethod.Get)
-                .SetUri("http://google.com")
-                .GetResult();
+                .SetUri("http://onreader.mdl.ru/MasteringConcurrencyInPython/content/figures/Fig0502.jpg")
+                .Build();
 
             var response = await client.GetResponseAsync(request);
-
-
 
             Console.WriteLine($"{(int)response.StatusCode} {response.StatusCode}");
 

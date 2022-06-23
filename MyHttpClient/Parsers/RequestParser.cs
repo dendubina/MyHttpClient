@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Linq;
 using System.Text;
 using MyHttpClientProject.Models;
 
@@ -9,7 +10,6 @@ namespace MyHttpClientProject.Parsers
         public static byte[] ParseToHttpRequestBytes(RequestOptions options)
         {
             var headers = new StringBuilder();
-            var result = new List<byte>();
 
             headers.AppendLine($"{options.Method} {options.Uri.AbsoluteUri} HTTP/1.1");
 
@@ -20,14 +20,9 @@ namespace MyHttpClientProject.Parsers
 
             headers.AppendLine();
 
-            result.AddRange(Encoding.UTF8.GetBytes(headers.ToString()));
+            var result = Encoding.UTF8.GetBytes(headers.ToString());
 
-            if (options.Body != null)
-            {
-                result.AddRange(options.Body);
-            }
-
-            return result.ToArray();
+            return options.Body is null ? result : result.Concat(options.Body.GetContent()).ToArray();
         }
     }
 }

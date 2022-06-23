@@ -1,20 +1,33 @@
-﻿
+﻿using System;
+
 namespace MyHttpClientProject.HttpBody
 {
-    public class ByteArrayBody : HttpBodyBase
+    public class ByteArrayBody : IHttpBody
     {
-        public ByteArrayBody(byte[] content) : this (content, null)
+        public string MediaType { get; }
+        private readonly byte[] _content;
+
+        public ByteArrayBody(byte[] content) : this(content, null)
         {
-            
+
         }
+
         public ByteArrayBody(byte[] content, string mediaType)
         {
-            BufferedContent = content;
-
-            if (mediaType != null)
+            if (content == null || content.Length == 0)
             {
-                MediaType = mediaType;
+                throw new ArgumentException("Content must not be null or empty");
             }
+
+            if (mediaType == string.Empty)
+            {
+                throw new ArgumentException("Media type must not be empty");
+            }
+
+            _content = content;
+            MediaType = mediaType;
         }
+
+        public byte[] GetContent() => _content;
     }
 }

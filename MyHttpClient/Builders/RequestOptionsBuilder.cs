@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using MyHttpClientProject.Exceptions;
 using MyHttpClientProject.Extensions;
 using MyHttpClientProject.HttpBody;
@@ -13,7 +11,6 @@ namespace MyHttpClientProject.Builders
     public class RequestOptionsBuilder : IRequestOptionsBuilder
     {
         private RequestOptions _options = new();
-        private readonly Encoding _defaultEncoding = Encoding.UTF8;
 
         public IRequestOptionsBuilder SetUri(string uri)
         {
@@ -31,12 +28,12 @@ namespace MyHttpClientProject.Builders
 
         public IRequestOptionsBuilder AddHeader(string name, string value)
         {
-            if (name.ContainsNewLine() || string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(name) || name.ContainsNewLine())
             {
                 throw new ArgumentException("Invalid header name format", nameof(name));
             }
 
-            if (value.ContainsNewLine() || string.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(value) || value.ContainsNewLine())
             {
                 throw new ArgumentException("Invalid header value format", nameof(value));
             }
@@ -48,53 +45,9 @@ namespace MyHttpClientProject.Builders
             return this;
         }
 
-        public IRequestOptionsBuilder AddBody(HttpBodyBase body)
+        public IRequestOptionsBuilder SetBody(IHttpBody body)
         {
-            _options.Headers ??= new Dictionary<string, string>();
-
-            if (body.MediaType != null)
-            {
-                _options.Headers.Add("Content-Type", body.MediaType);
-            }
-
-            if (body is not MultipartFormDataBody formDataBody)
-            {
-                _options.Headers.Add("Content-Length", body.BufferedContent.Length.ToString());
-                _options.Body = body.BufferedContent;
-            }
-            else
-            {
-                var result = new List<byte>();
-                var last = formDataBody.Contents.Last();
-
-                _options.Headers["Content-Type"] = formDataBody.MediaType + $";boundary=\"{formDataBody.Boundary}\"";
-
-                foreach (var (name, item) in formDataBody.Contents)
-                {
-                    StringBuilder header = new();
-
-                    header.AppendLine($"--{formDataBody.Boundary}");
-                    header.AppendLine($"Content-Disposition: form-data; name=\"{name}\"");
-
-                    if (item.MediaType != null)
-                    {
-                        header.AppendLine($"Content-Type: {item.MediaType}");
-                    }
-
-                    header.AppendLine();
-
-                    result.AddRange(_defaultEncoding.GetBytes(header.ToString()));
-
-                    result.AddRange(item.BufferedContent);
-
-                    result.AddRange(item.Equals(last.Value)
-                        ? _defaultEncoding.GetBytes($"--{formDataBody.Boundary}--")
-                        : _defaultEncoding.GetBytes(Environment.NewLine));
-                }
-
-                _options.Headers.Add("Content-Length", result.Count.ToString());
-                _options.Body = result.ToArray();
-            }
+            _options.Body = body;
 
             return this;
         }
@@ -106,7 +59,31 @@ namespace MyHttpClientProject.Builders
             return this;
         }
 
-        public RequestOptions GetResult()
+        public RequestOptions Build()
+        {
+            ValidateRequiredValues();
+
+            _options.Headers ??= new Dictionary<string, string>();
+
+            if (_options.Port == 0)
+            {
+                _options.Port = 80;
+            }
+
+            if (_options.Body != null)
+            {
+                AddRepresentationHeaders();
+            }
+
+            AddDefaultHeaders();
+
+            var result = _options;
+            _options = new RequestOptions();
+
+            return result;
+        }
+
+        private void ValidateRequiredValues()
         {
             if (_options.Uri == null)
             {
@@ -117,18 +94,27 @@ namespace MyHttpClientProject.Builders
             {
                 throw new OptionsBuildingException("Method should not be null");
             }
+        }
 
-            _options.Headers ??= new Dictionary<string, string>();
-
-            if (!_options.Headers.ContainsKey("Host"))
+        private void AddRepresentationHeaders()
+        {
+            if (_options.Body.MediaType != null && !_options.Headers.ContainsKey("Content-Type"))
             {
-                AddHeader("Host", $"{_options.Uri.Host}");
+                _options.Headers.Add("Content-Type", _options.Body.MediaType);
             }
 
-            var result = _options;
-            _options = new RequestOptions();
+            if (!_options.Headers.ContainsKey("Content-Length"))
+            {
+                _options.Headers.Add("Content-Length", _options.Body.GetContent().Length.ToString());
+            }
+        }
 
-            return result;
+        private void AddDefaultHeaders()
+        {
+            if (!_options.Headers.ContainsKey("Host"))
+            {
+                _options.Headers.Add("Host", _options.Uri.Host);
+            }
         }
     }
 }

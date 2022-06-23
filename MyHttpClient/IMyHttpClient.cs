@@ -5,8 +5,7 @@ using MyHttpClientProject.Models;
 namespace MyHttpClientProject
 {
     public interface IMyHttpClient : IDisposable
-
     {
-    Task<HttpResponse> GetResponseAsync(RequestOptions options);
+        Task<HttpResponse> GetResponseAsync(RequestOptions options);
     }
 }

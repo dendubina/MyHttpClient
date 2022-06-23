@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -8,37 +9,43 @@ namespace MyHttpClientProject.WebConnection
 {
     public class TcpClientConnection : IWebConnection
     {
-        private TcpClient _tcpClient;
-        private NetworkStream _networkStream;
+        private TcpClient _tcpClient = new();
         private string _connectionAddress;
         private ushort _connectionPort;
         private const int ReadTimeout = 200;
 
-        public async Task<byte[]> Send(string address, ushort port, IEnumerable<byte> data)
+        public async Task<byte[]> SendAsync(string address, ushort port, IEnumerable<byte> data)
         {
-            if (!CheckIfConnected(address, port))
+            if (string.IsNullOrWhiteSpace(address))
             {
+                throw new ArgumentException("Address must not be null or empty", nameof(address));
+            }
+
+            if (!CheckConnection(address, port))
+            {
+                _tcpClient.Close();
                 _tcpClient = new TcpClient(address, port);
-                _networkStream = _tcpClient.GetStream();
                 _connectionAddress = address;
                 _connectionPort = port;
             }
 
             _tcpClient.Client.ReceiveTimeout = ReadTimeout;
+            var networkStream = _tcpClient.GetStream();
             var dataArray = data.ToArray();
-            var response = new MemoryStream();
+            
 
-            await _networkStream.WriteAsync(dataArray, 0, dataArray.Length);
+            await networkStream.WriteAsync(dataArray, 0, dataArray.Length);
 
             var buffer = new byte[_tcpClient.ReceiveBufferSize];
 
             //need to discuss code below
+            var response = new MemoryStream();
             int bytesRead; 
             do
             {
                 try
                 {
-                    bytesRead = _networkStream.Read(buffer, 0, buffer.Length);
+                    bytesRead = networkStream.Read(buffer, 0, buffer.Length);
                     response.Write(buffer, 0, bytesRead);
                 }
                 catch (IOException ex)
@@ -54,31 +61,16 @@ namespace MyHttpClientProject.WebConnection
             return response.ToArray();
         }
 
-        public void Dispose()
-        {
-            _networkStream.Close();
-            _tcpClient.Close();
-        }
+        public void Dispose() => _tcpClient.Close();
 
-        private bool CheckIfConnected(string address, ushort port)
+        private bool CheckConnection(string address, ushort port)
         {
-            if (_tcpClient == null)
-            {
-                return false;
-            }
-
             if (!_tcpClient.Connected)
             {
                 return false;
             }
 
-            if (_connectionAddress == address && _connectionPort == port)
-            {
-                return true;
-            }
-
-            Dispose();
-            return false;
+            return _connectionAddress == address && _connectionPort == port;
         }
     }
 }

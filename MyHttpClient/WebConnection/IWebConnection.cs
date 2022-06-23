@@ -6,6 +6,6 @@ namespace MyHttpClientProject.WebConnection
 {
     public interface IWebConnection : IDisposable
     {
-        Task<byte[]> Send(string address, ushort port, IEnumerable<byte> data);
+        Task<byte[]> SendAsync(string address, ushort port, IEnumerable<byte> data);
     }
 }

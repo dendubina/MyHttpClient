@@ -13,12 +13,13 @@ namespace MyHttpClientProject
 
         public MyHttpClient() : this(new TcpClientConnection())
         {
+
         }
+
         public MyHttpClient(IWebConnection webClient)
         {
             _webConnection = webClient;
         }
-
 
         public async Task<HttpResponse> GetResponseAsync(RequestOptions options)
         {
@@ -28,21 +29,16 @@ namespace MyHttpClientProject
 
             try
             {
-                var response = await _webConnection.Send(options.Uri.Host, options.Port, requestBytes);
+                var response = await _webConnection.SendAsync(options.Uri.Host, options.Port, requestBytes);
 
-                var result = ResponseParser.ParseFromBytes(response);
+                var parsedResponse = ResponseParser.ParseFromBytes(response);
 
-                if (!result.ResponseHeaders.TryGetValue("Connection", out string value))
-                {
-                    return result;
-                }
-
-                if (value == "close")
+                if (parsedResponse.ResponseHeaders.TryGetValue("Connection", out string value) && value.ToLowerInvariant() == "close")
                 {
                     _webConnection.Dispose();
                 }
 
-                return result;
+                return parsedResponse;
             }
             finally
             {

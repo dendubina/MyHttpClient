@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using System.Text;
+using MyHttpClientProject.HttpBody;
 using MyHttpClientProject.Models;
 
 namespace MyHttpClientProject.Builders
@@ -8,8 +10,8 @@ namespace MyHttpClientProject.Builders
         IRequestOptionsBuilder SetMethod(HttpMethod method);
         IRequestOptionsBuilder SetUri(string uri);
         IRequestOptionsBuilder AddHeader(string name, string value);
-        IRequestOptionsBuilder AddBody(HttpBody.HttpBodyBase body);
+        IRequestOptionsBuilder SetBody(IHttpBody body);
         IRequestOptionsBuilder SetPort(ushort port);
-        RequestOptions GetResult();
+        RequestOptions Build();
     }
 }

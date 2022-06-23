@@ -19,7 +19,7 @@ namespace TestProject
             builder.SetMethod(HttpMethod.Get);
 
             //Act and Assert
-            Assert.Throws<OptionsBuildingException>(() => builder.GetResult());
+            Assert.Throws<OptionsBuildingException>(() => builder.Build());
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace TestProject
             builder.SetUri("http://google.com");
 
             //Act and Assert
-            Assert.Throws<OptionsBuildingException>(() => builder.GetResult());
+            Assert.Throws<OptionsBuildingException>(() => builder.Build());
         }
 
         [Theory]
@@ -62,7 +62,7 @@ namespace TestProject
             //Act
             var result = builder
                 .AddHeader(name, value)
-                .GetResult();
+                .Build();
 
             //Assert
             Assert.Equal(expected, result.Headers);
@@ -79,8 +79,8 @@ namespace TestProject
 
             //Act
             var result = builder
-                .AddBody(body)
-                .GetResult();
+                .SetBody(body)
+                .Build();
 
             //Assert
             Assert.Contains("Content-Type", result.Headers);
@@ -97,8 +97,8 @@ namespace TestProject
 
             //Act
             var result = builder
-                .AddBody(body)
-                .GetResult();
+                .SetBody(body)
+                .Build();
 
             //Assert
             Assert.Contains("Content-Length", result.Headers);

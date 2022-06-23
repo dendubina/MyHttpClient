@@ -27,8 +27,8 @@ namespace TestProject
             var options = builder
                 .SetMethod(HttpMethod.Get)
                 .SetUri("http://google.com")
-                .AddBody(new StringBody(body))
-                .GetResult();
+                .SetBody(new StringBody(body))
+                .Build();
 
             //Act
             var actual = RequestParser.ParseToHttpRequestBytes(options);
