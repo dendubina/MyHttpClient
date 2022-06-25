@@ -36,6 +36,7 @@ namespace TestProject
         [InlineData(":invalid header")]
         [InlineData("invalid ed:e")]
         [InlineData("invalid header:")]
+        [InlineData(" :  ")]
         public void ParseFromBytes_InvalidHeaderFound_ThrowsException(string invalidHeader)
         {
             //Arrange

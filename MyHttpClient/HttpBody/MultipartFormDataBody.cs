@@ -20,19 +20,19 @@ namespace MyHttpClientProject.HttpBody
             HttpBodyParts = new Dictionary<string, IHttpBody>();
         }
 
-        public void Add(IHttpBody body, string name)
+        public void Add(IHttpBody body, string fieldName)
         {
             if (body == null)
             {
-                throw new ArgumentException("Body must not be null", nameof(body));
+                throw new ArgumentNullException(nameof(body),"Body must not be null");
             }
 
-            if (string.IsNullOrWhiteSpace(name) || name.ContainsNewLine())
+            if (fieldName.NullOrWhiteSpaceOrContainsNewLine())
             {
-                throw new ArgumentException("Invalid name format", nameof(name));
+                throw new ArgumentException("Invalid name format", nameof(fieldName));
             }
 
-            HttpBodyParts.Add(name, body);
+            HttpBodyParts.Add(fieldName, body);
         }
 
         public byte[] GetContent()

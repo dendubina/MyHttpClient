@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using MyHttpClientProject;
 using MyHttpClientProject.Builders;
-using MyHttpClientProject.WebConnection;
 
 namespace AppForUsingClient
 {

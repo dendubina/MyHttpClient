@@ -75,6 +75,11 @@ namespace MyHttpClientProject.Parsers
                 var name = line[..separatorIndex].Trim();
                 var value = line[(separatorIndex + 2)..].Trim();
 
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(value))
+                {
+                    throw new FormatException($"Invalid header found: {line}");
+                }
+
                 result.Add(name, value);
             }
 

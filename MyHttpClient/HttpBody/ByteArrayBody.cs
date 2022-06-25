@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace MyHttpClientProject.HttpBody
 {
@@ -7,24 +8,23 @@ namespace MyHttpClientProject.HttpBody
         public string MediaType { get; }
         private readonly byte[] _content;
 
-        public ByteArrayBody(byte[] content) : this(content, null)
+        public ByteArrayBody(byte[] content) 
         {
-
-        }
-
-        public ByteArrayBody(byte[] content, string mediaType)
-        {
-            if (content == null || content.Length == 0)
+            if (content is null || !content.Any())
             {
                 throw new ArgumentException("Content must not be null or empty");
             }
 
-            if (mediaType == string.Empty)
-            {
-                throw new ArgumentException("Media type must not be empty");
-            }
-
             _content = content;
+        }
+
+        public ByteArrayBody(byte[] content, string mediaType) : this(content)
+        {
+            if (string.IsNullOrWhiteSpace(mediaType))
+            {
+                throw new ArgumentException("Media type must not be null  empty");
+            }
+            
             MediaType = mediaType;
         }
 

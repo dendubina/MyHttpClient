@@ -23,8 +23,8 @@ namespace MyHttpClientProject.Extensions
             return client.GetResponseAsync(request);
         }
 
-        public static async Task<HttpResponse> PostAsync<TReq>(this IMyHttpClient client, string uri, TReq body)
-            where TReq : IHttpBody
+        public static async Task<HttpResponse> PostAsync<THttpBody>(this IMyHttpClient client, string uri, THttpBody body)
+            where THttpBody : IHttpBody
         {
             var builder = new RequestOptionsBuilder();
 

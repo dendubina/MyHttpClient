@@ -28,12 +28,12 @@ namespace MyHttpClientProject.Builders
 
         public IRequestOptionsBuilder AddHeader(string name, string value)
         {
-            if (string.IsNullOrWhiteSpace(name) || name.ContainsNewLine())
+            if (name.NullOrWhiteSpaceOrContainsNewLine())
             {
                 throw new ArgumentException("Invalid header name format", nameof(name));
             }
 
-            if (string.IsNullOrWhiteSpace(value) || value.ContainsNewLine())
+            if (value.NullOrWhiteSpaceOrContainsNewLine())
             {
                 throw new ArgumentException("Invalid header value format", nameof(value));
             }
@@ -67,15 +67,12 @@ namespace MyHttpClientProject.Builders
 
             if (_options.Port == 0)
             {
-                _options.Port = 80;
+                SetPort(80);
             }
 
-            if (_options.Body != null)
-            {
-                AddRepresentationHeaders();
-            }
+            AddRepresentationHeaders();
 
-            AddDefaultHeaders();
+            AddHost();
 
             var result = _options;
             _options = new RequestOptions();
@@ -98,18 +95,23 @@ namespace MyHttpClientProject.Builders
 
         private void AddRepresentationHeaders()
         {
+            if (_options.Body == null)
+            {
+                return;
+            }
+
             if (_options.Body.MediaType != null && !_options.Headers.ContainsKey("Content-Type"))
             {
-                _options.Headers.Add("Content-Type", _options.Body.MediaType);
+                AddHeader("Content-Type", _options.Body.MediaType);
             }
 
             if (!_options.Headers.ContainsKey("Content-Length"))
             {
-                _options.Headers.Add("Content-Length", _options.Body.GetContent().Length.ToString());
+                AddHeader("Content-Length", _options.Body.GetContent().Length.ToString());
             }
         }
 
-        private void AddDefaultHeaders()
+        private void AddHost()
         {
             if (!_options.Headers.ContainsKey("Host"))
             {
