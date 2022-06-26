@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MyHttpClientProject;
 using MyHttpClientProject.Builders;
+using MyHttpClientProject.HttpBody;
 
 namespace AppForUsingClient
 {

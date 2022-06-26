@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Reflection.Metadata.Ecma335;
 using MyHttpClientProject.Exceptions;
 using MyHttpClientProject.Extensions;
 using MyHttpClientProject.HttpBody;
@@ -28,12 +29,12 @@ namespace MyHttpClientProject.Builders
 
         public IRequestOptionsBuilder AddHeader(string name, string value)
         {
-            if (name.NullOrWhiteSpaceOrContainsNewLine())
+            if (string.IsNullOrWhiteSpace(name) || name.ContainsNewLine())
             {
                 throw new ArgumentException("Invalid header name format", nameof(name));
             }
 
-            if (value.NullOrWhiteSpaceOrContainsNewLine())
+            if (string.IsNullOrWhiteSpace(value) || value.ContainsNewLine())
             {
                 throw new ArgumentException("Invalid header value format", nameof(value));
             }

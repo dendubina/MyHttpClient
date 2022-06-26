@@ -11,7 +11,7 @@ namespace MyHttpClientProject.Models
         public Uri Uri { get; internal set; }
         public IDictionary<string, string> Headers { get; internal set; } 
         public IHttpBody Body { get; internal set; }
-        public ushort Port { get; internal set; } = 80;
+        public ushort Port { get; internal set; }
 
         internal RequestOptions()
         {

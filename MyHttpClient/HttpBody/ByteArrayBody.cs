@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using MyHttpClientProject.Extensions;
 
 namespace MyHttpClientProject.HttpBody
 {
@@ -20,9 +21,9 @@ namespace MyHttpClientProject.HttpBody
 
         public ByteArrayBody(byte[] content, string mediaType) : this(content)
         {
-            if (string.IsNullOrWhiteSpace(mediaType))
+            if (string.IsNullOrWhiteSpace(mediaType) ||  mediaType.ContainsNewLine())
             {
-                throw new ArgumentException("Media type must not be null  empty");
+                throw new ArgumentException("Invalid mediaType value");
             }
             
             MediaType = mediaType;

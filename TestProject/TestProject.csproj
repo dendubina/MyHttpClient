@@ -23,4 +23,11 @@
     <ProjectReference Include="..\MyHttpClient\MyHttpClientProject.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+    <Folder Include="HttpBody\" />
+    <Folder Include="WebConnection\" />
+    <Folder Include="Parsers\" />
+  </ItemGroup>
+
 </Project>

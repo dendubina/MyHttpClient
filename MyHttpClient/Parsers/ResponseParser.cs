@@ -32,9 +32,10 @@ namespace MyHttpClientProject.Parsers
             return result;
         }
 
-        private static HttpStatusCode GetStatusCode(IReadOnlyList<string> data)
+        private static HttpStatusCode GetStatusCode(IEnumerable<string> data)
         {
-            var secondPart = data[0]
+            var secondPart = data
+                .First()
                 .Split(' ')
                 .Skip(1)
                 .FirstOrDefault();
@@ -61,11 +62,9 @@ namespace MyHttpClientProject.Parsers
                 throw new FormatException("No headers found");
             }
 
-            const char separator = ':';
-
             foreach (var line in headers)
             {
-                int separatorIndex = line.IndexOf(separator, StringComparison.Ordinal);
+                int separatorIndex = line.IndexOf(':', StringComparison.Ordinal);
 
                 if (separatorIndex <= 0 || line.Length <= separatorIndex + 2)
                 {

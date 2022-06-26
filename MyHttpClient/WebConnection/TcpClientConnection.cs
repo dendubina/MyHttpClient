@@ -21,25 +21,25 @@ namespace MyHttpClientProject.WebConnection
                 throw new ArgumentException("Address must not be null or empty", nameof(address));
             }
 
-            if (!CheckConnection(address, port))
+            if (data == null)
             {
-                _tcpClient.Close();
-                _tcpClient = new TcpClient(address, port);
-                _connectionAddress = address;
-                _connectionPort = port;
+                throw new ArgumentException("Data must not be null", nameof(data));
             }
 
-            _tcpClient.Client.ReceiveTimeout = ReadTimeout;
+            if (!CheckIfConnected(address, port))
+            {
+                OpenNewConnection(address, port);
+            }
+
             var networkStream = _tcpClient.GetStream();
             var dataArray = data.ToArray();
-            
 
             await networkStream.WriteAsync(dataArray, 0, dataArray.Length);
 
             var buffer = new byte[_tcpClient.ReceiveBufferSize];
 
             //need to discuss code below
-            var response = new MemoryStream();
+            using var response = new MemoryStream();
             int bytesRead; 
             do
             {
@@ -63,7 +63,7 @@ namespace MyHttpClientProject.WebConnection
 
         public void Dispose() => _tcpClient.Close();
 
-        private bool CheckConnection(string address, ushort port)
+        private bool CheckIfConnected(string address, ushort port)
         {
             if (!_tcpClient.Connected)
             {
@@ -71,6 +71,15 @@ namespace MyHttpClientProject.WebConnection
             }
 
             return _connectionAddress == address && _connectionPort == port;
+        }
+
+        private void OpenNewConnection(string address, ushort port)
+        {
+            _tcpClient.Close();
+            _tcpClient = new TcpClient(address, port);
+            _connectionAddress = address;
+            _connectionPort = port;
+            _tcpClient.Client.ReceiveTimeout = ReadTimeout;
         }
     }
 }

@@ -55,7 +55,6 @@ namespace MyHttpClientProject.Extensions
         public static IRequestOptionsBuilder SetConnectionHeader(this IRequestOptionsBuilder builder, bool connectionClose) =>
             builder.AddHeader("Connection", connectionClose ? "close" : "keep-alive");
 
-
         //to be continued (about 15 headers)
     }
 }

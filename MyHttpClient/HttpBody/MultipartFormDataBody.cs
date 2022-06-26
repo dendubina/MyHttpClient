@@ -8,64 +8,89 @@ namespace MyHttpClientProject.HttpBody
 {
     public class MultipartFormDataBody : IHttpBody
     {
-        public string Boundary { get; } = Guid.NewGuid().ToString();
+        private struct DataItem
+        {
+            public IHttpBody Data { get; init; }
+            public string FieldName { get; init; }
+            public string FileName { get; init; }
+        }
 
-        public IDictionary<string, IHttpBody> HttpBodyParts { get; }
-
+        private readonly List<DataItem> _dataItems = new();
+        private readonly string _boundary = Guid.NewGuid().ToString();
         public string MediaType { get; }
 
         public MultipartFormDataBody()
         {
-            MediaType = $"multipart/form-data;boundary=\"{Boundary}\"";
-            HttpBodyParts = new Dictionary<string, IHttpBody>();
+            MediaType = $"multipart/form-data;boundary=\"{_boundary}\"";
         }
 
-        public void Add(IHttpBody body, string fieldName)
+        public void Add(IHttpBody body, string fieldName, string fileName = null)
         {
             if (body == null)
             {
                 throw new ArgumentNullException(nameof(body),"Body must not be null");
             }
 
-            if (fieldName.NullOrWhiteSpaceOrContainsNewLine())
+            if (string.IsNullOrWhiteSpace(fieldName) || fieldName.ContainsNewLine())
             {
                 throw new ArgumentException("Invalid name format", nameof(fieldName));
             }
 
-            HttpBodyParts.Add(fieldName, body);
+            if (fileName != null && fileName.All(char.IsWhiteSpace) || fileName.ContainsNewLine())
+            {
+                throw new ArgumentException("Invalid fileName format");
+            }
+
+            _dataItems.Add(new DataItem
+            {
+                Data = body, 
+                FieldName = fieldName,
+                FileName = fileName,
+            });
         }
 
         public byte[] GetContent()
         {
-            if (HttpBodyParts.Count == 0)
+            if (!_dataItems.Any())
             {
                 throw new InvalidOperationException("The sequence has no elements");
             }
 
             var result = new List<byte>();
-            var lastHttpBodyPart = HttpBodyParts.Last();
+            var lastHttpBodyPart = _dataItems.Last();
 
-            foreach (var httpBodyPart in HttpBodyParts)
+            foreach (var httpBodyPart in _dataItems)
             {
-                StringBuilder header = new();
+                result.AddRange(GetHeaderBytesForDataItem(httpBodyPart));
 
-                header.AppendLine($"--{Boundary}");
-                header.AppendLine($"Content-Disposition: form-data; name=\"{httpBodyPart.Key}\"");
+                result.AddRange(Encoding.UTF8.GetBytes(Environment.NewLine));
 
-                if (httpBodyPart.Value.MediaType != null)
-                {
-                    header.AppendLine($"Content-Type: {httpBodyPart.Value.MediaType}");
-                }
+                result.AddRange(httpBodyPart.Data.GetContent());
 
-                header.AppendLine();
-
-                result.AddRange(Encoding.UTF8.GetBytes(header.ToString()));
-
-                result.AddRange(httpBodyPart.Value.GetContent());
+                result.AddRange(Encoding.UTF8.GetBytes(Environment.NewLine));
 
                 result.AddRange(httpBodyPart.Equals(lastHttpBodyPart)
-                    ? Encoding.UTF8.GetBytes($"--{Boundary}--")
+                    ? Encoding.UTF8.GetBytes($"--{_boundary}--")
                     : Encoding.UTF8.GetBytes(Environment.NewLine));
+            }
+
+            return result.ToArray();
+        }
+
+        private byte[] GetHeaderBytesForDataItem(DataItem dataItem)
+        {
+            var result = new List<byte>();
+
+            result.AddRange(Encoding.UTF8.GetBytes($"--{_boundary}{Environment.NewLine}"));
+            result.AddRange(Encoding.UTF8.GetBytes($"Content-Disposition: form-data; name=\"{dataItem.FieldName}\""));
+
+            result.AddRange(dataItem.FileName != null
+                ? Encoding.UTF8.GetBytes($"; filename=\"{dataItem.FileName}\"{Environment.NewLine}")
+                : Encoding.UTF8.GetBytes(Environment.NewLine));
+
+            if (dataItem.Data.MediaType != null)
+            {
+                result.AddRange(Encoding.UTF8.GetBytes($"Content-Type: {dataItem.Data.MediaType}{Environment.NewLine}"));
             }
 
             return result.ToArray();
