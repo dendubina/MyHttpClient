@@ -12,16 +12,13 @@ namespace TestProject.Builders
 {
     public class RequestOptionsBuilderTests
     {
-        private readonly RequestOptions _optionsWithBodyAndCustomHeader;
+        private readonly IRequestOptionsBuilder _builder;
 
         public RequestOptionsBuilderTests()
         {
-            _optionsWithBodyAndCustomHeader = new RequestOptionsBuilder()
+            _builder = new RequestOptionsBuilder()
                 .SetMethod(HttpMethod.Get)
-                .SetUri("http://google.com")
-                .AddHeader("name", "value")
-                .SetBody(new StringBody("content", Encoding.UTF8, "application/json"))
-                .Build();
+                .SetUri("http://google.com");
         }
 
         [Theory]
@@ -78,36 +75,47 @@ namespace TestProject.Builders
         [Fact]
         public void AddHeader_Should_AddHeader_When_ValidParameters()
         {
+            //Act
+            var result = _builder
+                .AddHeader("name", "value")
+                .Build();
+
             //Assert
-            Assert.Contains(new KeyValuePair<string,string>("name", "value"), _optionsWithBodyAndCustomHeader.Headers);
+            Assert.Contains(new KeyValuePair<string,string>("name", "value"), result.Headers);
         }
 
         [Fact]
         public void Build_Should_Add_Host_Header()
         {
-            //Assert
-            Assert.Contains("Host", _optionsWithBodyAndCustomHeader.Headers);
-        }
+            //Act
+            var result = _builder.Build();
 
-        [Fact]
-        public void SetBody_Should_Set_Body_Property()
-        {
             //Assert
-            Assert.NotNull(_optionsWithBodyAndCustomHeader.Body);
+            Assert.Contains("Host", result.Headers);
         }
 
         [Fact]
         public void Build_Should_Add_ContentTypeHeader_When_Body_Has_MediaType()
         {
+            //Act
+            var result = _builder
+                .SetBody(new StringBody("content", Encoding.UTF8, "application/json"))
+                .Build();
+
             //Assert
-            Assert.Contains("Content-Type", _optionsWithBodyAndCustomHeader.Headers);
+            Assert.Contains("Content-Type", result.Headers);
         }
 
         [Fact]
         public void Build_Should_Add_ContentLengthHeader_When_Body_Added()
         {
+            //Act
+            var result = _builder
+                .SetBody(new StringBody("content", Encoding.UTF8, "application/json"))
+                .Build();
+
             //Assert
-            Assert.Contains("Content-Length", _optionsWithBodyAndCustomHeader.Headers);
+            Assert.Contains("Content-Length", result.Headers);
         }
     }
 }

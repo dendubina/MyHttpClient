@@ -29,7 +29,7 @@ namespace MyHttpClientProject.Extensions
                 .OrderByDescending(x => x.Key)
                 .ToDictionary(pair => pair.Key, pair => pair.Value);
 
-            var last = sortedValues.Last();
+            var lastValue = sortedValues.Last();
 
             foreach (var item in sortedValues)
             {
@@ -40,7 +40,7 @@ namespace MyHttpClientProject.Extensions
                     result.Append($";q={item.Value.ToString("0.0", CultureInfo.InvariantCulture)}");
                 }
 
-                if (!item.Equals(last))
+                if (!item.Equals(lastValue))
                 {
                     result.Append(", ");
                 }

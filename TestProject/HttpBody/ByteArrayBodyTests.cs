@@ -38,11 +38,8 @@ namespace TestProject.HttpBody
             //Arrange
             var body = new ByteArrayBody(content);
 
-            //Act
-            var actual = body.GetContent();
-
-            //Assert
-            Assert.Equal(content, actual);
+            //Act and Assert
+            Assert.Equal(content, body.GetContent());
         }
     }
 }
