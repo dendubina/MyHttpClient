@@ -6,12 +6,12 @@ using MyHttpClientProject.HttpBody;
 using MyHttpClientProject.Parsers;
 using Xunit;
 
-namespace TestProject
+namespace TestProject.Parsers
 {
     public class RequestParserTests
     {
         [Fact]
-        public void ParseToHttpRequestBytes_ValidParameter_ReturnsExpectedByteArray()
+        public void ParseToHttpRequestBytes_Should_ReturnExpectedByteArray_When_HasBody()
         {
             //Arrange
             const string body = "<HTML>body</HTML>";
@@ -22,13 +22,31 @@ namespace TestProject
                               Environment.NewLine +
                               body;
 
-            var builder = new RequestOptionsBuilder();
-
-            var options = builder
+            var options = new RequestOptionsBuilder()
                 .SetMethod(HttpMethod.Get)
                 .SetUri("http://google.com")
                 .SetBody(new StringBody(body))
                 .Build();
+
+            //Act
+            var actual = RequestParser.ParseToHttpRequestBytes(options);
+
+            //Assert
+            Assert.Equal(Encoding.UTF8.GetBytes(expected), actual);
+        }
+
+        [Fact]
+        public void ParseToHttpRequestBytes_Should_ReturnExpectedByteArray_When_NoBody()
+        {
+            //Arrange
+            var options = new RequestOptionsBuilder()
+                .SetMethod(HttpMethod.Get)
+                .SetUri("http://google.com")
+                .Build();
+
+            string expected = "GET http://google.com/ HTTP/1.1" + Environment.NewLine +
+                              "Host: google.com" + Environment.NewLine +
+                              Environment.NewLine;
 
             //Act
             var actual = RequestParser.ParseToHttpRequestBytes(options);

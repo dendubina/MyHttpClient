@@ -11,7 +11,7 @@ namespace MyHttpClientProject.Parsers
     {
         public static HttpResponse ParseFromBytes(byte[] data)
         {
-            if (data == null || data.Length == 0)
+            if (data == null || !data.Any())
             {
                 throw new ArgumentException("Data should not be null or empty", nameof(data));
             }

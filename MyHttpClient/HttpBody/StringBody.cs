@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using MyHttpClientProject.Extensions;
 
 namespace MyHttpClientProject.HttpBody
 {
@@ -26,7 +27,7 @@ namespace MyHttpClientProject.HttpBody
                 throw new ArgumentException("Content should not be null or empty", nameof(content));
             }
 
-            if (string.IsNullOrWhiteSpace(contentType))
+            if (string.IsNullOrWhiteSpace(contentType) || contentType.ContainsNewLine())
             {
                 throw new ArgumentException("Content type should not be null or empty", nameof(contentType));
             }

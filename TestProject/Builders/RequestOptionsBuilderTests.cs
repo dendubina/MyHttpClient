@@ -5,14 +5,40 @@ using System.Text;
 using MyHttpClientProject.Builders;
 using MyHttpClientProject.Exceptions;
 using MyHttpClientProject.HttpBody;
+using MyHttpClientProject.Models;
 using Xunit;
 
-namespace TestProject
+namespace TestProject.Builders
 {
     public class RequestOptionsBuilderTests
     {
+        private readonly RequestOptions _optionsWithBodyAndCustomHeader;
+
+        public RequestOptionsBuilderTests()
+        {
+            _optionsWithBodyAndCustomHeader = new RequestOptionsBuilder()
+                .SetMethod(HttpMethod.Get)
+                .SetUri("http://google.com")
+                .AddHeader("name", "value")
+                .SetBody(new StringBody("content", Encoding.UTF8, "application/json"))
+                .Build();
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("http:///google.com")]
+        [InlineData("google.com")]
+        public void SetUri_Should_ThrowUriFormatException_When_InvalidValue(string value)
+        {
+            //Arrange
+            var builder = new RequestOptionsBuilder();
+
+            //Act and Assert
+            Assert.Throws<UriFormatException>(() => builder.SetUri(value));
+        }
+
         [Fact]
-        public void GetResult_UriNotSet_ThrowsException()
+        public void Build_Should_ThrowsException_When_Uri_NotSet()
         {
             //Arrange
             var builder = new RequestOptionsBuilder();
@@ -23,7 +49,7 @@ namespace TestProject
         }
 
         [Fact]
-        public void GetResult_MethodNotSet_ThrowsException()
+        public void Build_Should_ThrowException_When_MethodNotSet()
         {
             //Arrange
             var builder = new RequestOptionsBuilder();
@@ -34,11 +60,13 @@ namespace TestProject
         }
 
         [Theory]
-        [InlineData(" ", "value")]
+        [InlineData("", "value")]
         [InlineData("name", " ")]
         [InlineData("na\rme", "value")]
         [InlineData("name", "val\nue")]
-        public void AddHeader_InvalidParameter_ThrowsException(string name, string value)
+        [InlineData("name", null)]
+        [InlineData(null, "value")]
+        public void AddHeader_Should_ThrowException_When_InvalidParameter(string name, string value)
         {
             //Arrange
             var builder = new RequestOptionsBuilder();
@@ -48,60 +76,38 @@ namespace TestProject
         }
 
         [Fact]
-        public void AddHeader_ValidParameters_AddsHeader()
+        public void AddHeader_Should_AddHeader_When_ValidParameters()
         {
-            //Arrange
-            const string name = "name";
-            const string value = "value";
-            var expected = new Dictionary<string, string> { {"Host", "google.com" }, { name, value } };
-            var builder = new RequestOptionsBuilder();
-            builder
-                .SetMethod(HttpMethod.Get)
-                .SetUri("http://google.com");
-
-            //Act
-            var result = builder
-                .AddHeader(name, value)
-                .Build();
-
             //Assert
-            Assert.Equal(expected, result.Headers);
+            Assert.Contains(new KeyValuePair<string,string>("name", "value"), _optionsWithBodyAndCustomHeader.Headers);
         }
 
         [Fact]
-        public void AddBody_MediaTypeNotBull_AddsContentTypeHeader()
+        public void Build_Should_Add_Host_Header()
         {
-            //Arrange
-            var body = new StringBody("content", Encoding.UTF8, "application/json");
-            var builder = new RequestOptionsBuilder()
-                .SetMethod(HttpMethod.Post)
-                .SetUri("http://google.com");
-
-            //Act
-            var result = builder
-                .SetBody(body)
-                .Build();
-
             //Assert
-            Assert.Contains("Content-Type", result.Headers);
+            Assert.Contains("Host", _optionsWithBodyAndCustomHeader.Headers);
         }
 
         [Fact]
-        public void AddBody_HasContent_AddsContentLenghtHeader()
+        public void SetBody_Should_Set_Body_Property()
         {
-            //Arrange
-            var body = new StringBody("content", Encoding.UTF8, "application/json");
-            var builder = new RequestOptionsBuilder()
-                .SetMethod(HttpMethod.Post)
-                .SetUri("http://google.com");
-
-            //Act
-            var result = builder
-                .SetBody(body)
-                .Build();
-
             //Assert
-            Assert.Contains("Content-Length", result.Headers);
+            Assert.NotNull(_optionsWithBodyAndCustomHeader.Body);
+        }
+
+        [Fact]
+        public void Build_Should_Add_ContentTypeHeader_When_Body_Has_MediaType()
+        {
+            //Assert
+            Assert.Contains("Content-Type", _optionsWithBodyAndCustomHeader.Headers);
+        }
+
+        [Fact]
+        public void Build_Should_Add_ContentLengthHeader_When_Body_Added()
+        {
+            //Assert
+            Assert.Contains("Content-Length", _optionsWithBodyAndCustomHeader.Headers);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 using MyHttpClientProject.Parsers;
 using Xunit;
 
-namespace TestProject
+namespace TestProject.Parsers
 {
     public class ResponseParserTests
     {
@@ -14,15 +14,26 @@ namespace TestProject
 
         [Theory]
         [InlineData("Invalid status line")]
+        [InlineData("Status")]
+        [InlineData("Status line")]
         [InlineData(" ")]
-        public void ParseFromBytes_InvalidStatusLine_ThrowsException(string statusLine)
+        public void ParseFromBytes_Should_ThrowException_When_Invalid_Status_Line(string statusLine)
         {
             //Act and Assert
             Assert.Throws<FormatException>(() => ResponseParser.ParseFromBytes(_encoding.GetBytes(statusLine)));
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData(new byte[]{})]
+        public void ParseFromBytes_Should_ThrowException_When_NullOrEmpty_Data(byte[] data)
+        {
+            //Act and Assert
+            Assert.Throws<ArgumentException>(() => ResponseParser.ParseFromBytes(data));
+        }
+
         [Fact]
-        public void ParseFromBytes_NoHeadersFound_ThrowsException()
+        public void ParseFromBytes_Should_ThrowException_When_No_Headers_Found_()
         {
             //Arrange
             const string responseWithNoHeaders = "HTTP/1.1 200 OK";
@@ -37,7 +48,10 @@ namespace TestProject
         [InlineData("invalid ed:e")]
         [InlineData("invalid header:")]
         [InlineData(" :  ")]
-        public void ParseFromBytes_InvalidHeaderFound_ThrowsException(string invalidHeader)
+        [InlineData("header")]
+        [InlineData(":header")]
+        [InlineData("header:")]
+        public void ParseFromBytes_Should_ThrowException_When_InvalidHeaderFound(string invalidHeader)
         {
             //Arrange
             string responseWithInvalidHeader = "HTTP/1.1 200 OK" + Environment.NewLine +
@@ -49,7 +63,7 @@ namespace TestProject
         }
 
         [Fact]
-        public void ParseFromBytes_ValidResponseBytes_ReturnsExpectedHttpResponseInstance()
+        public void ParseFromBytes_Should_Return_Expected_HttpResponse_Instance_When_ValidResponseBytes()
         {
             //Arrange
             const string body = "example body";
