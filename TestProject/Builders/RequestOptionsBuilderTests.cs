@@ -5,7 +5,6 @@ using System.Text;
 using MyHttpClientProject.Builders;
 using MyHttpClientProject.Exceptions;
 using MyHttpClientProject.HttpBody;
-using MyHttpClientProject.Models;
 using Xunit;
 
 namespace TestProject.Builders

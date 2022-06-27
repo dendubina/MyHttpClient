@@ -26,11 +26,8 @@ namespace TestProject.HttpBody
         [InlineData("\r\n")]
         public void Constructor_Should_ThrowException_When_MediaType_Is_Invalid(string mediaType)
         {
-            //Arrange
-            string content = "content";
-
             //Act and Assert
-            Assert.Throws<ArgumentException>(() => new StringBody(content, Encoding.UTF8, mediaType));
+            Assert.Throws<ArgumentException>(() => new StringBody("content", Encoding.UTF8, mediaType));
         }
 
         [Fact]

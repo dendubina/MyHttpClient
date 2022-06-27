@@ -1,7 +1,4 @@
-﻿
-using System.Text;
-
-namespace MyHttpClientProject.HttpBody
+﻿namespace MyHttpClientProject.HttpBody
 {
     public interface IHttpBody
     {
