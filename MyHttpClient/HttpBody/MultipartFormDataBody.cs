@@ -71,8 +71,6 @@ namespace MyHttpClientProject.HttpBody
 
                 result.AddRange(httpBodyPart.Data.GetContent());
 
-               // result.AddRange(Encoding.UTF8.GetBytes(Environment.NewLine));
-
                 result.AddRange(httpBodyPart.Equals(lastHttpBodyPart)
                     ? Encoding.UTF8.GetBytes($"{Environment.NewLine}--{Boundary}--")
                     : Encoding.UTF8.GetBytes(Environment.NewLine));

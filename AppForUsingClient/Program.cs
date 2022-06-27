@@ -16,7 +16,7 @@ namespace AppForUsingClient
 
         static async Task Main(string[] args)
         {
-            /*using var client = new MyHttpClient();
+            using var client = new MyHttpClient();
             var builder = new RequestOptionsBuilder();
 
             var request = builder
@@ -37,17 +37,7 @@ namespace AppForUsingClient
             {
                 Console.WriteLine();
                 Console.WriteLine(Encoding.UTF8.GetString(response.ResponseBody.ToArray()));
-            }*/
-
-            var parameters = new Dictionary<string, double>
-            {
-                { "mediaType1", 0.5 },
-                { "mediaType2", 1 },
-                { "mediaType3", 0.8 }
-            };
-
-            var result = new RequestOptionsBuilder()
-                .SetAcceptHeader(parameters);
+            }
 
             Console.WriteLine("GAME OVER");
             Console.ReadLine();
