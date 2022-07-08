@@ -84,8 +84,8 @@ namespace MyHttpClientProject.HttpBody
             var result = new StringBuilder();
 
             result.AppendLine($"--{Boundary}");
-            result.Append($"Content-Disposition: form-data; name=\"{dataItem.FieldName}\"");
 
+            result.Append($"Content-Disposition: form-data; name=\"{dataItem.FieldName}\"");
             result.Append(dataItem.FileName != null
                 ? $"; filename=\"{dataItem.FileName}\"{Environment.NewLine}"
                 : Environment.NewLine);

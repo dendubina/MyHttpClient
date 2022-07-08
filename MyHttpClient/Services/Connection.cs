@@ -30,7 +30,7 @@ namespace MyHttpClientProject.Services
 
             if (data == null)
             {
-                throw new ArgumentException("Data must not be null", nameof(data));
+                throw new ArgumentException("Data must not be null or empty", nameof(data));
             }
 
             if (!_tcpClient.Connected(address, port))

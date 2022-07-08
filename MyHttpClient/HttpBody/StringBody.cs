@@ -16,10 +16,12 @@ namespace MyHttpClientProject.HttpBody
         {
 
         }
+
         public StringBody(string content, Encoding encoding) : this(content, encoding, DefaultMediaType)
         {
 
         }
+
         public StringBody(string content, Encoding encoding, string contentType)
         {
             if (string.IsNullOrWhiteSpace(content))

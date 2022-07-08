@@ -13,9 +13,7 @@ namespace MyHttpClientProject.Extensions
     {
         public static Task<HttpResponse> GetAsync(this IMyHttpClient client, string uri)
         {
-            var builder = new RequestOptionsBuilder();
-
-            var request = builder
+            var request = new RequestOptionsBuilder()
                 .SetMethod(HttpMethod.Get)
                 .SetUri(uri)
                 .Build();
@@ -26,9 +24,7 @@ namespace MyHttpClientProject.Extensions
         public static async Task<HttpResponse> PostAsync<THttpBody>(this IMyHttpClient client, string uri, THttpBody body)
             where THttpBody : IHttpBody
         {
-            var builder = new RequestOptionsBuilder();
-
-            var request = builder
+            var request = new RequestOptionsBuilder()
                 .SetMethod(HttpMethod.Post)
                 .SetUri(uri)
                 .SetBody(body)

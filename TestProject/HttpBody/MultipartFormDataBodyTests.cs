@@ -2,7 +2,6 @@
 using System.Text;
 using MyHttpClientProject.HttpBody;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace TestProject.HttpBody
 {
@@ -70,14 +69,12 @@ namespace TestProject.HttpBody
                 $"Content-Disposition: form-data; name=\"{firstContentFieldName}\"{Environment.NewLine}" +
                 $"Content-Type: text/plain; charset=utf-8{Environment.NewLine}" +
                 $"{Environment.NewLine}" +
-
                 $"{firstContent}{Environment.NewLine}" +
 
                 $"--{_multipartBody.Boundary}{Environment.NewLine}" +
                 $"Content-Disposition: form-data; name=\"{secondContentFieldName}\"; filename=\"{secondContentFileName}\"{Environment.NewLine}" +
                 $"Content-Type: text/plain; charset=utf-8{Environment.NewLine}" +
                 $"{Environment.NewLine}" +
-
                 $"{secondContent}{Environment.NewLine}" +
                 $"--{_multipartBody.Boundary}--";
 
