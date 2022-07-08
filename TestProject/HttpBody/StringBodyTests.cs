@@ -31,7 +31,7 @@ namespace TestProject.HttpBody
         }
 
         [Fact]
-        public void Constructor_Should_Set_Default_MediaType_And_Encoding_When_Not__Specified()
+        public void Constructor_Should_Set_Default_MediaType_And_Encoding_When_Not_Specified()
         {
             //Arrange
             string defaultMediaType = "text/plain; charset=utf-8";

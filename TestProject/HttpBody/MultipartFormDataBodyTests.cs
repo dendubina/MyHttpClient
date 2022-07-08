@@ -9,19 +9,6 @@ namespace TestProject.HttpBody
     public class MultipartFormDataBodyTests
     {
         private readonly MultipartFormDataBody _multipartBody = new();
-        private readonly ITestOutputHelper _output;
-
-        public MultipartFormDataBodyTests(ITestOutputHelper output)
-        {
-            _output = output;
-        }
-
-        private struct HttpBodyPart
-        {
-            public string Content { get; init; }
-            public string FieldName { get; init; }
-            public string FileName { get; init; }
-        }
 
         [Fact]
         public void Add_Should_ThrowException_When_Body_Parameter_Null()
@@ -66,42 +53,36 @@ namespace TestProject.HttpBody
         public void GetContent_Should_Return_Expected_Content()
         {
             //Arrange
-            var body = new MultipartFormDataBody();
+            var firstContent = "firstContent";
+            var firstContentFieldName = "firstContentName";
+            var firstContentPart = new StringBody("firstContent");
 
-            var firstDataPart = new HttpBodyPart
-            {
-                Content = "firstContent",
-                FieldName = "firstFieldName",
-            };
+            var secondContent = "secondContent";
+            var secondContentFieldName = "secondContentName";
+            var secondContentFileName = "secondContentFileName";
+            var secondContentPart = new StringBody(secondContent);
 
-            var secondDataPart = new HttpBodyPart()
-            {
-                Content = "secondContent",
-                FieldName = "secondFieldName",
-                FileName = "secondFileName",
-            };
-
-            body.Add(new StringBody(firstDataPart.Content), firstDataPart.FieldName);
-            body.Add(new StringBody(secondDataPart.Content), secondDataPart.FieldName, secondDataPart.FileName);
+            _multipartBody.Add(firstContentPart, firstContentFieldName);
+            _multipartBody.Add(secondContentPart, secondContentFieldName, secondContentFileName);
 
             string expected =
-                $"--{body.Boundary}{Environment.NewLine}" +
-                $"Content-Disposition: form-data; name=\"{firstDataPart.FieldName}\"{Environment.NewLine}" +
+                $"--{_multipartBody.Boundary}{Environment.NewLine}" +
+                $"Content-Disposition: form-data; name=\"{firstContentFieldName}\"{Environment.NewLine}" +
                 $"Content-Type: text/plain; charset=utf-8{Environment.NewLine}" +
                 $"{Environment.NewLine}" +
 
-                $"{firstDataPart.Content}{Environment.NewLine}" +
+                $"{firstContent}{Environment.NewLine}" +
 
-                $"--{body.Boundary}{Environment.NewLine}" +
-                $"Content-Disposition: form-data; name=\"{secondDataPart.FieldName}\"; filename=\"{secondDataPart.FileName}\"{Environment.NewLine}" +
+                $"--{_multipartBody.Boundary}{Environment.NewLine}" +
+                $"Content-Disposition: form-data; name=\"{secondContentFieldName}\"; filename=\"{secondContentFileName}\"{Environment.NewLine}" +
                 $"Content-Type: text/plain; charset=utf-8{Environment.NewLine}" +
                 $"{Environment.NewLine}" +
 
-                $"{secondDataPart.Content}{Environment.NewLine}" +
-                $"--{body.Boundary}--";
+                $"{secondContent}{Environment.NewLine}" +
+                $"--{_multipartBody.Boundary}--";
 
             //Act and Assert
-            Assert.Equal(Encoding.UTF8.GetBytes(expected), body.GetContent());
+            Assert.Equal(expected, Encoding.UTF8.GetString(_multipartBody.GetContent()));
         }
     }
 }
