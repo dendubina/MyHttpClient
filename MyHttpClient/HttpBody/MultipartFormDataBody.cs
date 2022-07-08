@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using MyHttpClientProject.Extensions;
@@ -15,7 +16,7 @@ namespace MyHttpClientProject.HttpBody
             public string FileName { get; init; }
         }
 
-        private readonly List<DataItem> _dataItems = new();
+        private readonly IList<DataItem> _dataItems = new List<DataItem>();
 
         public string Boundary { get; }
 
@@ -60,21 +61,20 @@ namespace MyHttpClientProject.HttpBody
                 throw new InvalidOperationException("The sequence has no elements");
             }
 
-            var result = new List<byte>();
-            var lastHttpBodyPart = _dataItems.Last();
+            using var result = new MemoryStream();
 
             foreach (var httpBodyPart in _dataItems)
             {
-                result.AddRange(Encoding.UTF8.GetBytes(GetHeadersStringForDataItem(httpBodyPart)));
+                result.Write(Encoding.UTF8.GetBytes(GetHeadersStringForDataItem(httpBodyPart)));
+                
+                result.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
 
-                result.AddRange(Encoding.UTF8.GetBytes(Environment.NewLine));
+                result.Write(httpBodyPart.Data.GetContent());
 
-                result.AddRange(httpBodyPart.Data.GetContent());
-
-                result.AddRange(httpBodyPart.Equals(lastHttpBodyPart)
-                    ? Encoding.UTF8.GetBytes($"{Environment.NewLine}--{Boundary}--")
-                    : Encoding.UTF8.GetBytes(Environment.NewLine));
+                result.Write(Encoding.UTF8.GetBytes(Environment.NewLine));
             }
+
+            result.Write(Encoding.UTF8.GetBytes($"--{Boundary}--"));
 
             return result.ToArray();
         }

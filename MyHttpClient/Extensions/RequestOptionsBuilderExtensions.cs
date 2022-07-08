@@ -17,7 +17,7 @@ namespace MyHttpClientProject.Extensions
 
         public static IRequestOptionsBuilder SetAcceptHeader(this IRequestOptionsBuilder builder, IDictionary<string, double> mediaTypesWithQFactor)
         {
-            if (mediaTypesWithQFactor.Values.Any(x => x is > 1 or <= 0))
+            if (mediaTypesWithQFactor.Values.Any(x => x is > 1 or < 0))
             {
                 throw new ArgumentException("Invalid q-factor value");
             }

@@ -53,7 +53,7 @@ namespace MyHttpClientProject.Extensions
             return response.ResponseBody.ToArray();
         }
 
-        public static async Task<MemoryStream> PostWithStreamResponseAsync<THttpBody>(this IMyHttpClient client, string uri, THttpBody body)
+        public static async Task<Stream> PostWithStreamResponseAsync<THttpBody>(this IMyHttpClient client, string uri, THttpBody body)
             where THttpBody : IHttpBody
         {
             var response = await PostAsync(client, uri, body);

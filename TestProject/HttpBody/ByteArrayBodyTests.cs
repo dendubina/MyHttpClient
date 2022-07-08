@@ -24,7 +24,7 @@ namespace TestProject.HttpBody
         public void Constructor_Should_ThrowException_When_MediaType_Is_Invalid(string mediaType)
         {
             //Arrange
-            var content = new byte[1];
+            var content = new byte[] {1, 2, 3, 4, 5};
 
             //Act and Assert
             Assert.Throws<ArgumentException>(() => new ByteArrayBody(content, mediaType));

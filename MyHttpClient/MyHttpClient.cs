@@ -1,24 +1,26 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MyHttpClientProject.Models;
 using MyHttpClientProject.Parsers;
-using MyHttpClientProject.WebConnection;
+using MyHttpClientProject.Services;
+using MyHttpClientProject.Services.Interfaces;
 
 namespace MyHttpClientProject
 {
     public class MyHttpClient : IMyHttpClient
     {
-        private readonly IWebConnection _webConnection;
+        private readonly IConnection _connection;
         private static readonly SemaphoreSlim SemaphoreSlim = new(1,1);
 
-        public MyHttpClient() : this(new TcpClientConnection())
+        public MyHttpClient() : this(new Connection())
         {
 
         }
 
-        public MyHttpClient(IWebConnection webClient)
+        public MyHttpClient(IConnection connection)
         {
-            _webConnection = webClient;
+            _connection = connection;
         }
 
         public async Task<HttpResponse> GetResponseAsync(RequestOptions options)
@@ -29,13 +31,21 @@ namespace MyHttpClientProject
 
             try
             {
-                var response = await _webConnection.SendAsync(options.Uri.Host, options.Port, requestBytes);
 
-                var parsedResponse = ResponseParser.ParseFromBytes(response);
+                await _connection.SendAsync(options.Uri.Host, options.Port, requestBytes);
+
+                var headers = _connection.ReadHeaders();
+
+                var parsedResponse = ResponseParser.ParseFromBytes(headers.ToArray());
+
+                if (parsedResponse.ResponseHeaders.TryGetValue("Content-Length", out string lengthString) && int.TryParse(lengthString, out int parsedLength))
+                {
+                    parsedResponse.ResponseBody = await _connection.ReadBody(parsedLength);
+                }
 
                 if (parsedResponse.ResponseHeaders.TryGetValue("Connection", out string value) && value.ToLowerInvariant() == "close")
                 {
-                    _webConnection.Dispose();
+                    _connection.CloseConnection();
                 }
 
                 return parsedResponse;
@@ -48,7 +58,7 @@ namespace MyHttpClientProject
 
         public void Dispose()
         {
-            _webConnection.Dispose();
+            _connection.CloseConnection();
         }
     }
 }

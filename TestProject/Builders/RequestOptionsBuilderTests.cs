@@ -11,48 +11,36 @@ namespace TestProject.Builders
 {
     public class RequestOptionsBuilderTests
     {
+        private readonly IRequestOptionsBuilder _builderWithRequiredValues;
         private readonly IRequestOptionsBuilder _builder;
 
         public RequestOptionsBuilderTests()
         {
-            _builder = new RequestOptionsBuilder()
+            _builder = new RequestOptionsBuilder();
+
+            _builderWithRequiredValues = new RequestOptionsBuilder()
                 .SetMethod(HttpMethod.Get)
                 .SetUri("http://google.com");
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData("http:///google.com")]
-        [InlineData("google.com")]
-        public void SetUri_Should_ThrowUriFormatException_When_InvalidValue(string value)
-        {
-            //Arrange
-            var builder = new RequestOptionsBuilder();
-
-            //Act and Assert
-            Assert.Throws<UriFormatException>(() => builder.SetUri(value));
         }
 
         [Fact]
         public void Build_Should_ThrowsException_When_Uri_NotSet()
         {
             //Arrange
-            var builder = new RequestOptionsBuilder();
-            builder.SetMethod(HttpMethod.Get);
+            _builder.SetMethod(HttpMethod.Get);
 
             //Act and Assert
-            Assert.Throws<OptionsBuildingException>(() => builder.Build());
+            Assert.Throws<OptionsBuildingException>(() => _builder.Build());
         }
 
         [Fact]
         public void Build_Should_ThrowException_When_MethodNotSet()
         {
             //Arrange
-            var builder = new RequestOptionsBuilder();
-            builder.SetUri("http://google.com");
+            _builder.SetUri("http://google.com");
 
             //Act and Assert
-            Assert.Throws<OptionsBuildingException>(() => builder.Build());
+            Assert.Throws<OptionsBuildingException>(() => _builder.Build());
         }
 
         [Theory]
@@ -64,18 +52,25 @@ namespace TestProject.Builders
         [InlineData(null, "value")]
         public void AddHeader_Should_ThrowException_When_InvalidParameter(string name, string value)
         {
+            //Act and Assert
+            Assert.Throws<ArgumentException>(()=> _builder.AddHeader(name, value));
+        }
+
+        [Fact]
+        public void AddHeader_Should_ThrowException_When_Adding_Header_With_Same_Name_Twice()
+        {
             //Arrange
-            var builder = new RequestOptionsBuilder();
+            _builder.AddHeader("name", "value");
 
             //Act and Assert
-            Assert.Throws<ArgumentException>(()=> builder.AddHeader(name, value));
+            Assert.Throws<ArgumentException>(() => _builder.AddHeader("name", "value"));
         }
 
         [Fact]
         public void AddHeader_Should_AddHeader_When_ValidParameters()
         {
             //Act
-            var result = _builder
+            var result = _builderWithRequiredValues
                 .AddHeader("name", "value")
                 .Build();
 
@@ -87,34 +82,27 @@ namespace TestProject.Builders
         public void Build_Should_Add_Host_Header()
         {
             //Act
-            var result = _builder.Build();
+            var result = _builderWithRequiredValues.Build();
 
             //Assert
-            Assert.Contains("Host", result.Headers);
+            Assert.Equal(result.Uri.Host, result.Headers["Host"]);
         }
 
         [Fact]
-        public void Build_Should_Add_ContentTypeHeader_When_Body_Has_MediaType()
+        public void Build_Should_Add_Expected_RepresentationHeaders_When_Body_Added()
         {
+            //Arrange
+            const string content = "content";
+            const string contentType = "application/json";
+
             //Act
-            var result = _builder
-                .SetBody(new StringBody("content", Encoding.UTF8, "application/json"))
+            var result = _builderWithRequiredValues
+                .SetBody(new StringBody(content, Encoding.UTF8, contentType))
                 .Build();
 
             //Assert
-            Assert.Contains("Content-Type", result.Headers);
-        }
-
-        [Fact]
-        public void Build_Should_Add_ContentLengthHeader_When_Body_Added()
-        {
-            //Act
-            var result = _builder
-                .SetBody(new StringBody("content", Encoding.UTF8, "application/json"))
-                .Build();
-
-            //Assert
-            Assert.Contains("Content-Length", result.Headers);
+            Assert.Contains(result.Headers["Content-Length"], Encoding.UTF8.GetByteCount(content).ToString());
+            Assert.Contains(result.Headers["Content-Type"], $"{contentType}; charset=utf-8");
         }
     }
 }

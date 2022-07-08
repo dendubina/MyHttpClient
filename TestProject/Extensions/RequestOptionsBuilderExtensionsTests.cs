@@ -47,7 +47,6 @@ namespace TestProject.Extensions
         [InlineData(double.MaxValue)]
         [InlineData(double.MinValue)]
         [InlineData(-1)]
-        [InlineData(0)]
         public void SetAcceptHeader_Should_ThrowException_When_Invalid_QFactor_value(double qFactor)
         {
             //Act and Assert

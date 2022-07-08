@@ -7,14 +7,10 @@ namespace MyHttpClientProject.Models
 {
     public class RequestOptions
     {
-        public HttpMethod Method { get; internal set; }
-        public Uri Uri { get; internal set; }
-        public IDictionary<string, string> Headers { get; internal set; } 
-        public IHttpBody Body { get; internal set; }
-        public ushort Port { get; internal set; }
-
-        internal RequestOptions()
-        {
-        }
+        public HttpMethod Method { get; set; }
+        public Uri Uri { get; set; }
+        public IDictionary<string, string> Headers { get; set; } 
+        public IHttpBody Body { get; set; }
+        public ushort Port { get; set; }
     }
 }

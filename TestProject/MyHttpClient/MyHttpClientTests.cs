@@ -5,14 +5,13 @@ using System.Text;
 using Moq;
 using MyHttpClientProject.Builders;
 using MyHttpClientProject.Models;
-using MyHttpClientProject.WebConnection;
 using Xunit;
 
 namespace TestProject.MyHttpClient
 {
     public class MyHttpClientTests
     {
-        private readonly Mock<IWebConnection> _mockedConnection;
+        /*private readonly Mock<IWebConnection> _mockedConnection;
         private readonly RequestOptions _requestOptions;
 
         public MyHttpClientTests()
@@ -67,6 +66,6 @@ namespace TestProject.MyHttpClient
 
             //Assert
             _mockedConnection.Verify(x => x.Dispose(), Times.Never);
-        }
+        }*/
     }
 }

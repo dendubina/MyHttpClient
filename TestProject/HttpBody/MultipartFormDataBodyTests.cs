@@ -2,12 +2,19 @@
 using System.Text;
 using MyHttpClientProject.HttpBody;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace TestProject.HttpBody
 {
     public class MultipartFormDataBodyTests
     {
         private readonly MultipartFormDataBody _multipartBody = new();
+        private readonly ITestOutputHelper _output;
+
+        public MultipartFormDataBodyTests(ITestOutputHelper output)
+        {
+            _output = output;
+        }
 
         private struct HttpBodyPart
         {
@@ -56,7 +63,7 @@ namespace TestProject.HttpBody
         }
 
         [Fact]
-        public void GetContent_Should_Return_Expected_Content() // ну а как))
+        public void GetContent_Should_Return_Expected_Content()
         {
             //Arrange
             var body = new MultipartFormDataBody();
@@ -78,20 +85,19 @@ namespace TestProject.HttpBody
             body.Add(new StringBody(secondDataPart.Content), secondDataPart.FieldName, secondDataPart.FileName);
 
             string expected =
-                $"--{body.Boundary}" + Environment.NewLine +
-                $"Content-Disposition: form-data; name=\"{firstDataPart.FieldName}\"" + Environment.NewLine +
-                "Content-Type: text/plain; charset=utf-8" + Environment.NewLine +
-                Environment.NewLine +
+                $"--{body.Boundary}{Environment.NewLine}" +
+                $"Content-Disposition: form-data; name=\"{firstDataPart.FieldName}\"{Environment.NewLine}" +
+                $"Content-Type: text/plain; charset=utf-8{Environment.NewLine}" +
+                $"{Environment.NewLine}" +
 
-                firstDataPart.Content + Environment.NewLine +
+                $"{firstDataPart.Content}{Environment.NewLine}" +
 
-                $"--{body.Boundary}" + Environment.NewLine +
-                $"Content-Disposition: form-data; name=\"{secondDataPart.FieldName}\"; filename=\"{secondDataPart.FileName}\"" +
-                Environment.NewLine +
-                "Content-Type: text/plain; charset=utf-8" + Environment.NewLine +
-                Environment.NewLine +
+                $"--{body.Boundary}{Environment.NewLine}" +
+                $"Content-Disposition: form-data; name=\"{secondDataPart.FieldName}\"; filename=\"{secondDataPart.FileName}\"{Environment.NewLine}" +
+                $"Content-Type: text/plain; charset=utf-8{Environment.NewLine}" +
+                $"{Environment.NewLine}" +
 
-                secondDataPart.Content + Environment.NewLine +
+                $"{secondDataPart.Content}{Environment.NewLine}" +
                 $"--{body.Boundary}--";
 
             //Act and Assert

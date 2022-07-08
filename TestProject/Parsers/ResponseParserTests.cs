@@ -66,20 +66,16 @@ namespace TestProject.Parsers
         public void ParseFromBytes_Should_Return_Expected_HttpResponse_Instance_When_ValidResponseBytes()
         {
             //Arrange
-            const string body = "example body";
-            int bodyByteCount = _encoding.GetByteCount(body);
             var headers = new Dictionary<string, string>
             {
                 { "Location", "http://www.google.com/" },
                 { "Connection", "close" },
-                { "Content-Length", $"{bodyByteCount}" },
             };
             string responseWithBody = "HTTP/1.1 301 Moved Permanently" + Environment.NewLine +
                                       "Location: http://www.google.com/" + Environment.NewLine +
                                       "Connection: close" + Environment.NewLine +
-                                      $"Content-Length: {bodyByteCount}" + Environment.NewLine +
-                                      Environment.NewLine +
-                                      body;
+                                      Environment.NewLine;
+                                     
 
             //Act
             var result = ResponseParser.ParseFromBytes(_encoding.GetBytes(responseWithBody));
@@ -87,7 +83,6 @@ namespace TestProject.Parsers
             //Assert
             Assert.Equal(HttpStatusCode.Moved, result.StatusCode);
             Assert.Equal(headers, result.ResponseHeaders);
-            Assert.Equal(body, _encoding.GetString(result.ResponseBody.ToArray()));
         }
     }
 }

@@ -20,22 +20,16 @@ namespace MyHttpClientProject.Parsers
 
             var result = new HttpResponse
             {
-                StatusCode = GetStatusCode(dataStringArray),
+                StatusCode = GetStatusCode(dataStringArray.First()),
                 ResponseHeaders = GetHeaders(dataStringArray)
             };
-
-            if (result.ResponseHeaders.TryGetValue("Content-Length", out var value) && int.TryParse(value, out var parsedValue))
-            {
-                result.ResponseBody = data.TakeLast(parsedValue).ToArray();
-            }
 
             return result;
         }
 
-        private static HttpStatusCode GetStatusCode(IEnumerable<string> data)
+        private static HttpStatusCode GetStatusCode(string firstLine)
         {
-            var secondPart = data
-                .First()
+            var secondPart = firstLine
                 .Split(' ')
                 .Skip(1)
                 .FirstOrDefault();
