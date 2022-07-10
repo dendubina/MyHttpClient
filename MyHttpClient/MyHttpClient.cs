@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MyHttpClientProject.Models;
-using MyHttpClientProject.Parsers;
 using MyHttpClientProject.Services;
 using MyHttpClientProject.Services.Interfaces;
+using MyHttpClientProject.Services.Parsers;
 
 namespace MyHttpClientProject
 {

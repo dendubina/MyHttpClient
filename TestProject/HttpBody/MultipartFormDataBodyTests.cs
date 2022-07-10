@@ -9,6 +9,17 @@ namespace TestProject.HttpBody
     {
         private readonly MultipartFormDataBody _multipartBody = new();
 
+
+        [Fact]
+        public void Constructor_Should_Set_Expected_Media_Type()
+        {
+            //Arrange
+            var expected = $"multipart/form-data;boundary=\"{_multipartBody.Boundary}\"";
+
+            //Assert
+            Assert.Equal(expected, _multipartBody.MediaType);
+        }
+
         [Fact]
         public void Add_Should_ThrowException_When_Body_Parameter_Null()
         {
@@ -38,7 +49,7 @@ namespace TestProject.HttpBody
         public void Add_Should_ThrowException_When_FileName_Not_Valid(string fileName)
         {
             //Act and Assert
-            Assert.Throws<ArgumentException>(() => _multipartBody.Add(new StringBody("content"), fileName));
+            Assert.Throws<ArgumentException>(() => _multipartBody.Add(new StringBody("content"), "fieldName", fileName));
         }
 
         [Fact]

@@ -11,14 +11,14 @@ namespace MyHttpClientProject.Extensions
 {
     public static class MyHttpClientExtensions
     {
-        public static Task<HttpResponse> GetAsync(this IMyHttpClient client, string uri)
+        public static async Task<HttpResponse> GetAsync(this IMyHttpClient client, string uri)
         {
             var request = new RequestOptionsBuilder()
                 .SetMethod(HttpMethod.Get)
                 .SetUri(uri)
                 .Build();
 
-            return client.GetResponseAsync(request);
+            return await client.GetResponseAsync(request);
         }
 
         public static async Task<HttpResponse> PostAsync<THttpBody>(this IMyHttpClient client, string uri, THttpBody body)

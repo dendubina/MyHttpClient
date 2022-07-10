@@ -77,25 +77,19 @@ namespace MyHttpClientProject.Services
             }
 
             var buffer = new byte[bodyLength];
-            int bytesRead = 0;
 
-            while (bytesRead < bodyLength)
+            var bytesRead = await NetworkStream.ReadAsync(buffer, 0, buffer.Length);
+
+            if (bytesRead != bodyLength)
             {
-                bytesRead += await NetworkStream.ReadAsync(buffer, 0, buffer.Length);
+                throw new InvalidOperationException("Invalid response body length");
             }
 
             return buffer;
         }
 
         private bool Connected(string address, ushort port)
-        {
-            if (_tcpClient is not { Connected: true })
-            {
-                return false;
-            }
-
-            return _connectionAddress == address && _connectionPort == port;
-        }
+            => _tcpClient is not {Connected: false} && _connectionAddress == address && _connectionPort == port;
 
         private void OpenNewConnection(string address, ushort port)
         {
@@ -108,6 +102,11 @@ namespace MyHttpClientProject.Services
         }
 
         public void CloseConnection() => _tcpClient?.Close();
+
+        public void Dispose()
+        {
+            _tcpClient?.Close();
+        }
     }
 }
 

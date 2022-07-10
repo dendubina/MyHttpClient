@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
-using MyHttpClientProject.Parsers;
+using MyHttpClientProject.Services.Parsers;
 using Xunit;
 
-namespace TestProject.Parsers
+namespace TestProject.Services.Parsers
 {
     public class ResponseParserTests
     {
@@ -54,8 +53,8 @@ namespace TestProject.Parsers
         public void ParseFromBytes_Should_ThrowException_When_InvalidHeaderFound(string invalidHeader)
         {
             //Arrange
-            string responseWithInvalidHeader = "HTTP/1.1 200 OK" + Environment.NewLine +
-                                               "Server: Apache" + Environment.NewLine +
+            string responseWithInvalidHeader = $"HTTP/1.1 200 OK{Environment.NewLine}" +
+                                               $"Server: Apache{Environment.NewLine}" +
                                                invalidHeader;
 
             //Act and Assert

@@ -4,10 +4,10 @@ using System.Net.Http;
 using System.Text;
 using MyHttpClientProject.HttpBody;
 using MyHttpClientProject.Models;
-using MyHttpClientProject.Parsers;
+using MyHttpClientProject.Services.Parsers;
 using Xunit;
 
-namespace TestProject.Parsers
+namespace TestProject.Services.Parsers
 {
     public class RequestParserTests
     {
@@ -70,12 +70,13 @@ namespace TestProject.Parsers
         {
             //Arrange
             const string body = "<HTML>body</HTML>";
-            string expected = "GET http://google.com/ HTTP/1.1" + Environment.NewLine +
-                              "Host: google.com" + Environment.NewLine +
-                              "Content-Length: " + Encoding.UTF8.GetByteCount(body) + Environment.NewLine +
-                              "Content-Type: text/plain; charset=utf-8" + Environment.NewLine +
-                              Environment.NewLine +
-                              body;
+
+            string expected = $"GET http://google.com/ HTTP/1.1{Environment.NewLine}" +
+                              $"Host: google.com{Environment.NewLine}" +
+                              $"Content-Length: {Encoding.UTF8.GetByteCount(body)}{Environment.NewLine}" +
+                              $"Content-Type: text/plain; charset=utf-8{Environment.NewLine}" +
+                              $"{Environment.NewLine}" +
+                              $"{body}";
 
             _options.Body = new StringBody(body);
             _options.Headers.Add("Content-Length", Encoding.UTF8.GetByteCount(body).ToString());
@@ -92,9 +93,9 @@ namespace TestProject.Parsers
         public void ParseToHttpRequestBytes_Should_ReturnExpectedByteArray_When_NoBody()
         {
             //Arrange
-            string expected = "GET http://google.com/ HTTP/1.1" + Environment.NewLine +
-                              "Host: google.com" + Environment.NewLine +
-                              Environment.NewLine;
+            string expected = $"GET http://google.com/ HTTP/1.1{Environment.NewLine}" +
+                              $"Host: google.com{Environment.NewLine}" +
+                              $"{Environment.NewLine}";
 
             //Act
             var actual = RequestParser.ParseToHttpRequestBytes(_options);

@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using MyHttpClientProject.Models;
 
-namespace MyHttpClientProject.Parsers
+namespace MyHttpClientProject.Services.Parsers
 {
     public static class ResponseParser
     {

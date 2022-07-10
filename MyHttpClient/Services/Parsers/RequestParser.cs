@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using MyHttpClientProject.Models;
 
-namespace MyHttpClientProject.Parsers
+namespace MyHttpClientProject.Services.Parsers
 {
     public static class RequestParser
     {

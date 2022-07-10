@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MyHttpClientProject.Services.Interfaces
 {
-    public interface IConnection
+    public interface IConnection : IDisposable
     {
         Task SendRequestAsync(string address, ushort port, IEnumerable<byte> data);
         IEnumerable<byte> ReadHeaders();
