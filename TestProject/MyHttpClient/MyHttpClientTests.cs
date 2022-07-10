@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using Moq;
-using MyHttpClientProject.Builders;
 using MyHttpClientProject.Models;
+using MyHttpClientProject.Services.Interfaces;
 using Xunit;
 
 namespace TestProject.MyHttpClient
 {
     public class MyHttpClientTests
     {
-        /*private readonly Mock<IWebConnection> _mockedConnection;
+        private readonly Mock<IConnection> _mockedConnection;
         private readonly RequestOptions _requestOptions;
 
         public MyHttpClientTests()
         {
-            _mockedConnection = new Mock<IWebConnection>();
+            _mockedConnection = new Mock<IConnection>();
 
-            _requestOptions = new RequestOptionsBuilder()
-                .SetMethod(HttpMethod.Get)
-                .SetUri("http://google.com")
-                .Build();
+            _requestOptions = new RequestOptions()
+            {
+                Uri = new Uri("http://google.com"),
+                Method = HttpMethod.Get,
+            };
         }
 
         [Fact]
@@ -66,6 +67,6 @@ namespace TestProject.MyHttpClient
 
             //Assert
             _mockedConnection.Verify(x => x.Dispose(), Times.Never);
-        }*/
+        }
     }
 }

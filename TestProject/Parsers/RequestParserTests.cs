@@ -6,7 +6,6 @@ using MyHttpClientProject.HttpBody;
 using MyHttpClientProject.Models;
 using MyHttpClientProject.Parsers;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace TestProject.Parsers
 {

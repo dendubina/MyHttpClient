@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using MyHttpClientProject.Services.Interfaces;
@@ -9,19 +10,13 @@ namespace MyHttpClientProject.Services
 {
     public class Connection : IConnection
     {
-        private readonly ITcpClient _tcpClient;
+        private TcpClient _tcpClient;
+        private string _connectionAddress;
+        private ushort _connectionPort;
 
-        public Connection() : this(new MyTcpClient())
-        {
+        private NetworkStream NetworkStream => _tcpClient != null ? _tcpClient.GetStream() : throw new InvalidOperationException("Not Connected");
 
-        }
-
-        public Connection(ITcpClient client)
-        {
-            _tcpClient = client;
-        }
-
-        public async Task SendAsync(string address, ushort port, IEnumerable<byte> data)
+        public async Task SendRequestAsync(string address, ushort port, IEnumerable<byte> data)
         {
             if (string.IsNullOrWhiteSpace(address))
             {
@@ -30,25 +25,22 @@ namespace MyHttpClientProject.Services
 
             if (data == null)
             {
-                throw new ArgumentException("Data must not be null or empty", nameof(data));
+                throw new ArgumentException("Data must not be null", nameof(data));
             }
 
-            if (!_tcpClient.Connected(address, port))
+            if (!Connected(address, port))
             {
-                _tcpClient.OpenNewConnection(address, port);
+                OpenNewConnection(address, port);
             }
 
-            var networkStream = _tcpClient.GetStream();
             var dataArray = data.ToArray();
 
-            await networkStream.WriteAsync(dataArray, 0, dataArray.Length);
+            await NetworkStream.WriteAsync(dataArray, 0, dataArray.Length);
         }
 
         public IEnumerable<byte> ReadHeaders()
         {
-            var stream = _tcpClient.GetStream();
-
-            if (!stream.CanRead)
+            if (!NetworkStream.CanRead)
             {
                 throw new InvalidOperationException("Stream is unable to read");
             }
@@ -60,9 +52,9 @@ namespace MyHttpClientProject.Services
 
             while (!endOfHeadersReached)
             {
-                var currentValue = stream.ReadByte();
+                var current = NetworkStream.ReadByte();
 
-                result.Add((byte)currentValue);
+                result.Add((byte)current);
 
                 endOfHeadersReached = result
                     .TakeLast(sequenceToFind.Length)
@@ -79,9 +71,7 @@ namespace MyHttpClientProject.Services
                 throw new ArgumentException("Body length must be > 0");
             }
 
-            var stream = _tcpClient.GetStream();
-
-            if (!stream.CanRead)
+            if (!NetworkStream.CanRead)
             {
                 throw new InvalidOperationException("Stream is unable to read");
             }
@@ -91,12 +81,33 @@ namespace MyHttpClientProject.Services
 
             while (bytesRead < bodyLength)
             {
-                bytesRead += await stream.ReadAsync(buffer, 0, buffer.Length);
+                bytesRead += await NetworkStream.ReadAsync(buffer, 0, buffer.Length);
             }
 
             return buffer;
         }
 
+        private bool Connected(string address, ushort port)
+        {
+            if (_tcpClient is not { Connected: true })
+            {
+                return false;
+            }
+
+            return _connectionAddress == address && _connectionPort == port;
+        }
+
+        private void OpenNewConnection(string address, ushort port)
+        {
+            CloseConnection();
+
+            _tcpClient = new TcpClient(address, port);
+
+            _connectionAddress = address;
+            _connectionPort = port;
+        }
+
         public void CloseConnection() => _tcpClient?.Close();
     }
 }
+

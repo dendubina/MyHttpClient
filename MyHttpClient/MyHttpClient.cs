@@ -32,7 +32,7 @@ namespace MyHttpClientProject
             try
             {
 
-                await _connection.SendAsync(options.Uri.Host, options.Port, requestBytes);
+                await _connection.SendRequestAsync(options.Uri.Host, options.Port, requestBytes);
 
                 var headers = _connection.ReadHeaders();
 

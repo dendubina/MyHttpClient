@@ -71,10 +71,10 @@ namespace TestProject.Parsers
                 { "Location", "http://www.google.com/" },
                 { "Connection", "close" },
             };
-            string responseWithBody = "HTTP/1.1 301 Moved Permanently" + Environment.NewLine +
-                                      "Location: http://www.google.com/" + Environment.NewLine +
-                                      "Connection: close" + Environment.NewLine +
-                                      Environment.NewLine;
+            string responseWithBody = $"HTTP/1.1 301 Moved Permanently{Environment.NewLine}" + 
+                                      $"Location: http://www.google.com/{Environment.NewLine}" +
+                                      $"Connection: close{Environment.NewLine}" +
+                                      $"{Environment.NewLine}";
                                      
 
             //Act
