@@ -78,6 +78,32 @@ namespace TestProject.Builders
             Assert.Contains(new KeyValuePair<string,string>("name", "value"), result.Headers);
         }
 
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(int.MinValue)]
+        public void SetReadTimeout_And_SetSendTimeout_Should_ThrowException_When_Invalid_Parameter(int milliseconds)
+        {
+            //Act and Assert
+            Assert.Throws<ArgumentException>(() => _builder.SetReadTimeout(milliseconds));
+            Assert.Throws<ArgumentException>(() => _builder.SetSendTimeout(milliseconds));
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(int.MaxValue)]
+        public void SetReadTimeout_And_SetSendTimeout_Should_Set_Value_To_RequestOptions_Property_When_Valid_Parameter(int milliseconds)
+        {
+            //Act 
+            var options = _builderWithRequiredValues
+                .SetReadTimeout(milliseconds)
+                .SetSendTimeout(milliseconds)
+                .Build();
+
+            //Assert
+            Assert.Equal(milliseconds, options.ReadTimeout);
+            Assert.Equal(milliseconds, options.SendTimeout);
+        }
+
         [Fact]
         public void Build_Should_Add_Host_Header()
         {

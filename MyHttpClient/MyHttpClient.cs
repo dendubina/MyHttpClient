@@ -29,6 +29,9 @@ namespace MyHttpClientProject
 
             await SemaphoreSlim.WaitAsync();
 
+            _connection.ReadTimeout = options.ReadTimeout;
+            _connection.SendTimeout = options.SendTimeout;
+
             try
             {
 

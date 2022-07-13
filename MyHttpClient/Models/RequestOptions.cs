@@ -12,5 +12,7 @@ namespace MyHttpClientProject.Models
         public IDictionary<string, string> Headers { get; set; } 
         public IHttpBody Body { get; set; }
         public ushort Port { get; set; }
+        public int SendTimeout { get; set; }
+        public int ReadTimeout { get; set; }
     }
 }

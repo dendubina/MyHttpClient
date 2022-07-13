@@ -7,7 +7,7 @@ namespace AppForUsingClient
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("GAME OVER");
+            Console.WriteLine("Hello world!");
             Console.ReadLine();
         }
     }

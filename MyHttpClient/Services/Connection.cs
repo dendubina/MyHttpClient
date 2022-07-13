@@ -10,6 +10,9 @@ namespace MyHttpClientProject.Services
 {
     public class Connection : IConnection
     {
+        public int ReadTimeout { get; set; }
+        public int SendTimeout { get; set; }
+
         private TcpClient _tcpClient;
         private string _connectionAddress;
         private ushort _connectionPort;
@@ -97,16 +100,16 @@ namespace MyHttpClientProject.Services
 
             _tcpClient = new TcpClient(address, port);
 
+            _tcpClient.Client.ReceiveTimeout = ReadTimeout;
+            _tcpClient.Client.SendTimeout = SendTimeout;
+
             _connectionAddress = address;
             _connectionPort = port;
         }
 
         public void CloseConnection() => _tcpClient?.Close();
 
-        public void Dispose()
-        {
-            _tcpClient?.Close();
-        }
+        public void Dispose() => _tcpClient?.Close();
     }
 }
 

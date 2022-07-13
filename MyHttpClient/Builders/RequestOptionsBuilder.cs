@@ -59,6 +59,30 @@ namespace MyHttpClientProject.Builders
             return this;
         }
 
+        public IRequestOptionsBuilder SetSendTimeout(int milliseconds)
+        {
+            if (milliseconds < 0)
+            {
+                throw new ArgumentException("Timeout must be > 0");
+            }
+
+            _options.SendTimeout = milliseconds;
+
+            return this;
+        }
+
+        public IRequestOptionsBuilder SetReadTimeout(int milliseconds)
+        {
+            if (milliseconds < 0)
+            {
+                throw new ArgumentException("Timeout must be > 0");
+            }
+
+            _options.ReadTimeout = milliseconds;
+
+            return this;
+        }
+
         public RequestOptions Build()
         {
             ValidateRequiredValues();
