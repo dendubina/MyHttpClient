@@ -13,6 +13,6 @@ namespace MyHttpClientProject.Models
         public IHttpBody Body { get; set; }
         public ushort Port { get; set; }
         public int SendTimeout { get; set; }
-        public int ReadTimeout { get; set; }
+        public int ReceiveTimeout { get; set; }
     }
 }

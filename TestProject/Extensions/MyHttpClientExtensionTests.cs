@@ -50,7 +50,7 @@ namespace TestProject.Extensions
                 .Returns(Encoding.UTF8.GetBytes(responseHeadersString));
 
             _mockedConnection
-                .Setup(x => x.ReadBody(It.IsAny<int>()))
+                .Setup(x => x.ReadBodyAsync(It.IsAny<int>()))
                 .ReturnsAsync(_expectedContent);
 
             _httpClient = new MyHttpClientProject.MyHttpClient(_mockedConnection.Object);

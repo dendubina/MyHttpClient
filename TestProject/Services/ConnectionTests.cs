@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using MyHttpClientProject.Services;
 using MyHttpClientProject.Services.Interfaces;
 using Xunit;
@@ -7,6 +8,7 @@ namespace TestProject.Services
 {
     public class ConnectionTests
     {
+        private const ushort ExamplePort = 1;
         private readonly IConnection _connection = new Connection();
 
         [Theory]
@@ -16,14 +18,14 @@ namespace TestProject.Services
         public void SendRequestAsync_Should_ThrowException_When_Address_Invalid(string address)
         {
             //Act and Assert
-            Assert.ThrowsAsync<ArgumentException>(() => _connection.SendRequestAsync(address, 1, new byte[] { 1, 2, 3 }));
+            Assert.ThrowsAsync<ArgumentException>(() => _connection.SendRequestAsync(address, ExamplePort, new byte[] { 1, 2, 3 }));
         }
 
         [Fact]
         public void SendAsync_Should_ThrowException_When_Data_Null()
         {
             //Act and Assert
-            Assert.ThrowsAsync<ArgumentException>(() => _connection.SendRequestAsync("google.com", 1, null));
+            Assert.ThrowsAsync<ArgumentException>(() => _connection.SendRequestAsync("google.com", ExamplePort, null));
         }
 
         [Fact]
@@ -33,11 +35,14 @@ namespace TestProject.Services
             Assert.Throws<InvalidOperationException>(() => _connection.ReadHeaders());
         }
 
-        [Fact]
-        public void ReadBody_Should_ThrowException_When_NotConnected()
+        [Theory]
+        [InlineData(1)]
+        [InlineData(10)]
+        [InlineData(int.MaxValue)]
+        public void ReadBody_Should_ThrowException_When_NotConnected(int bodyLength)
         {
             //Act and Assert
-            Assert.ThrowsAsync<InvalidOperationException>(() => _connection.ReadBody(1));
+            Assert.ThrowsAsync<InvalidOperationException>(() => _connection.ReadBodyAsync(bodyLength));
         }
 
         [Theory]
@@ -46,7 +51,7 @@ namespace TestProject.Services
         public void ReadBody_Should_ThrowException_When_BodyLength_Invalid(int bodyLength)
         {
             //Act and Assert
-            Assert.ThrowsAsync<ArgumentException>(() => _connection.ReadBody(bodyLength));
+            Assert.ThrowsAsync<ArgumentException>(() => _connection.ReadBodyAsync(bodyLength));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -10,7 +11,7 @@ namespace MyHttpClientProject.Services
 {
     public class Connection : IConnection
     {
-        public int ReadTimeout { get; set; }
+        public int ReceiveTimeout { get; set; }
         public int SendTimeout { get; set; }
 
         private TcpClient _tcpClient;
@@ -57,6 +58,11 @@ namespace MyHttpClientProject.Services
             {
                 var current = NetworkStream.ReadByte();
 
+                if (current == -1 || !NetworkStream.DataAvailable)
+                {
+                    throw new InvalidOperationException("Invalid response");
+                }
+
                 result.Add((byte)current);
 
                 endOfHeadersReached = result
@@ -67,7 +73,7 @@ namespace MyHttpClientProject.Services
             return result;
         }
 
-        public async Task<IEnumerable<byte>> ReadBody(int bodyLength)
+        public async Task<IEnumerable<byte>> ReadBodyAsync(int bodyLength)
         {
             if (bodyLength <= 0)
             {
@@ -79,16 +85,25 @@ namespace MyHttpClientProject.Services
                 throw new InvalidOperationException("Stream is unable to read");
             }
 
-            var buffer = new byte[bodyLength];
+            var buffer = new byte[_tcpClient.ReceiveBufferSize];
 
-            var bytesRead = await NetworkStream.ReadAsync(buffer, 0, buffer.Length);
+            var response = new MemoryStream();
 
-            if (bytesRead != bodyLength)
-            {
-                throw new InvalidOperationException("Invalid response body length");
-            }
+            do
+            { 
+                var bytesRead = await NetworkStream.ReadAsync(buffer, 0, buffer.Length);
 
-            return buffer;
+                if (bytesRead == 0)
+                {
+                    throw new InvalidOperationException("Invalid response body length");
+                }
+
+                await response.WriteAsync(buffer, 0, bytesRead);
+
+            } while (response.Length != bodyLength);
+
+
+            return response.ToArray();
         }
 
         private bool Connected(string address, ushort port)
@@ -100,7 +115,7 @@ namespace MyHttpClientProject.Services
 
             _tcpClient = new TcpClient(address, port);
 
-            _tcpClient.Client.ReceiveTimeout = ReadTimeout;
+            _tcpClient.Client.ReceiveTimeout = ReceiveTimeout;
             _tcpClient.Client.SendTimeout = SendTimeout;
 
             _connectionAddress = address;

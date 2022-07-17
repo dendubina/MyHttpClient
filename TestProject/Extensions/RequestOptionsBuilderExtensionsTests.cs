@@ -23,7 +23,7 @@ namespace TestProject.Extensions
         {
             //Act
             var result = _builder
-                .SetConnectionHeader(true)
+                .SetConnectionHeader(closeConnection: true)
                 .Build();
 
             //Assert
@@ -35,7 +35,7 @@ namespace TestProject.Extensions
         {
             //Act
             var result = _builder
-                .SetConnectionHeader(false)
+                .SetConnectionHeader(closeConnection: false)
                 .Build();
 
             //Assert

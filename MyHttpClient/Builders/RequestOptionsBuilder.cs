@@ -71,14 +71,14 @@ namespace MyHttpClientProject.Builders
             return this;
         }
 
-        public IRequestOptionsBuilder SetReadTimeout(int milliseconds)
+        public IRequestOptionsBuilder SetReceiveTimeout(int milliseconds)
         {
             if (milliseconds < 0)
             {
                 throw new ArgumentException("Timeout must be > 0");
             }
 
-            _options.ReadTimeout = milliseconds;
+            _options.ReceiveTimeout = milliseconds;
 
             return this;
         }
@@ -96,7 +96,7 @@ namespace MyHttpClientProject.Builders
 
             AddRepresentationHeaders();
 
-            AddHost();
+            AddHostHeader();
 
             var result = _options;
             _options = new RequestOptions();
@@ -135,11 +135,11 @@ namespace MyHttpClientProject.Builders
             }
         }
 
-        private void AddHost()
+        private void AddHostHeader()
         {
             if (!_options.Headers.ContainsKey("Host"))
             {
-                _options.Headers.Add("Host", _options.Uri.Host);
+                AddHeader("Host", _options.Uri.Host);
             }
         }
     }

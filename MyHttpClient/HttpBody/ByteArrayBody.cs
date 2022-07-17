@@ -6,8 +6,8 @@ namespace MyHttpClientProject.HttpBody
 {
     public class ByteArrayBody : IHttpBody
     {
-        public string MediaType { get; }
         private readonly byte[] _content;
+        public string MediaType { get; }
 
         public ByteArrayBody(byte[] content) 
         {

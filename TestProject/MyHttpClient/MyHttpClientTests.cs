@@ -98,7 +98,7 @@ namespace TestProject.MyHttpClient
             await _httpClient.GetResponseAsync(_requestOptions);
 
             //Assert
-            _mockedConnection.Verify(x => x.ReadBody(It.IsAny<int>()), Times.Never);
+            _mockedConnection.Verify(x => x.ReadBodyAsync(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace TestProject.MyHttpClient
                 .Returns(Encoding.UTF8.GetBytes(responseHeadersString));
             
             _mockedConnection
-                .Setup(x => x.ReadBody(contentLength))
+                .Setup(x => x.ReadBodyAsync(contentLength))
                 .ReturnsAsync(Encoding.UTF8.GetBytes(content));
 
             //Act

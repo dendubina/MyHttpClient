@@ -41,7 +41,7 @@ namespace MyHttpClientProject.HttpBody
                 throw new ArgumentException("Invalid name format", nameof(fieldName));
             }
 
-            if (fileName != null && fileName.All(char.IsWhiteSpace) || fileName != null && fileName.ContainsNewLine())
+            if (fileName != null && (fileName.All(char.IsWhiteSpace) || fileName.ContainsNewLine()))
             {
                 throw new ArgumentException("Invalid fileName format", nameof(fileName));
             }

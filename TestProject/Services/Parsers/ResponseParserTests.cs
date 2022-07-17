@@ -32,7 +32,7 @@ namespace TestProject.Services.Parsers
         }
 
         [Fact]
-        public void ParseFromBytes_Should_ThrowException_When_No_Headers_Found_()
+        public void ParseFromBytes_Should_ThrowException_When_Response_Without_Headers()
         {
             //Arrange
             const string responseWithNoHeaders = "HTTP/1.1 200 OK";
@@ -62,26 +62,26 @@ namespace TestProject.Services.Parsers
         }
 
         [Fact]
-        public void ParseFromBytes_Should_Return_Expected_HttpResponse_Instance_When_ValidResponseBytes()
+        public void ParseFromBytes_Should_Return_Expected_HttpResponse_Instance_When_Valid_Response_Bytes()
         {
             //Arrange
-            var headers = new Dictionary<string, string>
+            var expectedHeaders = new Dictionary<string, string>
             {
                 { "Location", "http://www.google.com/" },
                 { "Connection", "close" },
             };
-            string responseWithBody = $"HTTP/1.1 301 Moved Permanently{Environment.NewLine}" + 
+            string response = $"HTTP/1.1 301 Moved Permanently{Environment.NewLine}" + 
                                       $"Location: http://www.google.com/{Environment.NewLine}" +
                                       $"Connection: close{Environment.NewLine}" +
                                       $"{Environment.NewLine}";
                                      
 
             //Act
-            var result = ResponseParser.ParseFromBytes(_encoding.GetBytes(responseWithBody));
+            var result = ResponseParser.ParseFromBytes(_encoding.GetBytes(response));
 
             //Assert
             Assert.Equal(HttpStatusCode.Moved, result.StatusCode);
-            Assert.Equal(headers, result.ResponseHeaders);
+            Assert.Equal(expectedHeaders, result.ResponseHeaders);
         }
     }
 }

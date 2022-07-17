@@ -29,7 +29,7 @@ namespace MyHttpClientProject
 
             await SemaphoreSlim.WaitAsync();
 
-            _connection.ReadTimeout = options.ReadTimeout;
+            _connection.ReceiveTimeout = options.ReceiveTimeout;
             _connection.SendTimeout = options.SendTimeout;
 
             try
@@ -43,7 +43,7 @@ namespace MyHttpClientProject
 
                 if (parsedResponse.ResponseHeaders.TryGetValue("Content-Length", out string lengthString) && int.TryParse(lengthString, out int parsedLength))
                 {
-                    parsedResponse.ResponseBody = await _connection.ReadBody(parsedLength);
+                    parsedResponse.ResponseBody = await _connection.ReadBodyAsync(parsedLength);
                 }
 
                 if (parsedResponse.ResponseHeaders.TryGetValue("Connection", out string value) && value.ToLowerInvariant() == "close")

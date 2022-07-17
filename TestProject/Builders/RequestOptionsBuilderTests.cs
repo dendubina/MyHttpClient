@@ -24,7 +24,7 @@ namespace TestProject.Builders
         }
 
         [Fact]
-        public void Build_Should_ThrowsException_When_Uri_NotSet()
+        public void Build_Should_ThrowException_When_Uri_NotSet()
         {
             //Arrange
             _builder.SetMethod(HttpMethod.Get);
@@ -81,26 +81,48 @@ namespace TestProject.Builders
         [Theory]
         [InlineData(-1)]
         [InlineData(int.MinValue)]
-        public void SetReadTimeout_And_SetSendTimeout_Should_ThrowException_When_Invalid_Parameter(int milliseconds)
+        public void SetReceiveTimeout_Should_ThrowException_When_Invalid_Parameter(int milliseconds)
         {
             //Act and Assert
-            Assert.Throws<ArgumentException>(() => _builder.SetReadTimeout(milliseconds));
+            Assert.Throws<ArgumentException>(() => _builder.SetReceiveTimeout(milliseconds));
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(int.MinValue)]
+        public void SetSendTimeout_Should_ThrowException_When_Invalid_Parameter(int milliseconds)
+        {
+            //Act and Assert
             Assert.Throws<ArgumentException>(() => _builder.SetSendTimeout(milliseconds));
+        }
+
+
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(int.MaxValue)]
+        public void SetReceiveTimeout_And_SetSendTimeout_Should_Set_Value_To_RequestOptions_Property_When_Valid_Parameter(int milliseconds)
+        {
+            //Act 
+            var options = _builderWithRequiredValues
+                .SetReceiveTimeout(milliseconds)
+                .Build();
+
+            //Assert
+            Assert.Equal(milliseconds, options.ReceiveTimeout);
         }
 
         [Theory]
         [InlineData(1)]
         [InlineData(int.MaxValue)]
-        public void SetReadTimeout_And_SetSendTimeout_Should_Set_Value_To_RequestOptions_Property_When_Valid_Parameter(int milliseconds)
+        public void SetSendTimeout_Should_Set_Value_To_RequestOptions_Property_When_Valid_Parameter(int milliseconds)
         {
             //Act 
             var options = _builderWithRequiredValues
-                .SetReadTimeout(milliseconds)
                 .SetSendTimeout(milliseconds)
                 .Build();
 
             //Assert
-            Assert.Equal(milliseconds, options.ReadTimeout);
             Assert.Equal(milliseconds, options.SendTimeout);
         }
 

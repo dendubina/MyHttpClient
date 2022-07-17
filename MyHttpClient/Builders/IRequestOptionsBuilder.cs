@@ -12,7 +12,7 @@ namespace MyHttpClientProject.Builders
         IRequestOptionsBuilder SetBody(IHttpBody body);
         IRequestOptionsBuilder SetPort(ushort port);
         IRequestOptionsBuilder SetSendTimeout(int milliseconds);
-        IRequestOptionsBuilder SetReadTimeout(int milliseconds);
+        IRequestOptionsBuilder SetReceiveTimeout(int milliseconds);
         RequestOptions Build();
     }
 }
