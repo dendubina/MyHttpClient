@@ -47,10 +47,26 @@ namespace TestProject.Extensions
         [InlineData(double.MaxValue)]
         [InlineData(double.MinValue)]
         [InlineData(-1)]
-        public void SetAcceptHeader_Should_ThrowException_When_Invalid_QFactor_value(double qFactor)
+        public void SetAcceptHeader_Should_ThrowException_When_Invalid_QFactor_Value(double qFactor)
         {
             //Act and Assert
             Assert.Throws<ArgumentException>(() => _builder.SetAcceptHeader("mediaType", qFactor));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void SetAcceptHeader_Should_ThrowException_When_Invalid_MediaType_Value(string mediaType)
+        {
+            //Act and Assert
+            Assert.Throws<ArgumentException>(() => _builder.SetAcceptHeader(mediaType));
+        }
+
+        [Fact]
+        public void SetAcceptHeader_Should_ThrowException_When_MediaType_Null()
+        {
+            //Act and Assert
+            Assert.Throws<ArgumentNullException>(() => _builder.SetAcceptHeader(mediaType: null));
         }
 
         [Fact]

@@ -4,12 +4,13 @@ using System.Threading.Tasks;
 
 namespace MyHttpClientProject.Services.Interfaces
 {
-    public interface IConnection : IDisposable
+    public interface IConnectionHandler
     {
         int SendTimeout { get; set; }
         int ReceiveTimeout { get; set; }
+        int ReceiveBufferSize { get; set; }
 
-        Task SendRequestAsync(string address, ushort port, IEnumerable<byte> data);
+        Task SendAsync(string address, ushort port, IEnumerable<byte> data);
         IEnumerable<byte> ReadHeaders();
         Task<IEnumerable<byte>> ReadBodyAsync(int bodyLength);
         void CloseConnection();

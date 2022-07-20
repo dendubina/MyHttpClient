@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MyHttpClientProject.Models;
@@ -10,21 +11,26 @@ namespace MyHttpClientProject
 {
     public class MyHttpClient : IMyHttpClient
     {
-        private readonly IConnection _connection;
+        private readonly IConnectionHandler _connection;
         private static readonly SemaphoreSlim SemaphoreSlim = new(1,1);
 
-        public MyHttpClient() : this(new Connection())
+        public MyHttpClient() : this(new ConnectionHandler())
         {
 
         }
 
-        public MyHttpClient(IConnection connection)
+        public MyHttpClient(IConnectionHandler connection)
         {
             _connection = connection;
         }
 
         public async Task<HttpResponse> GetResponseAsync(RequestOptions options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options), "Request options must not be null");
+            }
+
             var requestBytes = RequestParser.ParseToHttpRequestBytes(options);
 
             await SemaphoreSlim.WaitAsync();
@@ -35,7 +41,7 @@ namespace MyHttpClientProject
             try
             {
 
-                await _connection.SendRequestAsync(options.Uri.Host, options.Port, requestBytes);
+                await _connection.SendAsync(options.Uri.Host, options.Port, requestBytes);
 
                 var headers = _connection.ReadHeaders();
 

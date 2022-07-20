@@ -41,7 +41,7 @@ namespace TestProject.Extensions
 
         public MyHttpClientExtensionTests()
         {
-            var mockedConnection = new Mock<IConnection>();
+            var mockedConnection = new Mock<IConnectionHandler>();
 
             mockedConnection
                 .Setup(x => x.ReadHeaders())

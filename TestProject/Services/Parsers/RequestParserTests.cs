@@ -32,7 +32,7 @@ namespace TestProject.Services.Parsers
         public void ParseToHttpRequestBytes_Should_ThrowException_When_Parameter_Null()
         {
             //Act and Assert
-            Assert.Throws<NullReferenceException>(() => RequestParser.ParseToHttpRequestBytes(null));
+            Assert.Throws<ArgumentNullException>(() => RequestParser.ParseToHttpRequestBytes(null));
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace TestProject.Services.Parsers
             _options.Method = null;
 
             //Act and Assert
-            Assert.Throws<NullReferenceException>(() => RequestParser.ParseToHttpRequestBytes(_options));
+            Assert.Throws<ArgumentNullException>(() => RequestParser.ParseToHttpRequestBytes(_options));
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace TestProject.Services.Parsers
             _options.Uri = null;
             
             //Act and Assert
-            Assert.Throws<NullReferenceException>(() => RequestParser.ParseToHttpRequestBytes(_options));
+            Assert.Throws<ArgumentNullException>(() => RequestParser.ParseToHttpRequestBytes(_options));
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace TestProject.Services.Parsers
             _options.Headers = null;
 
             //Act and Assert
-            Assert.Throws<NullReferenceException>(() => RequestParser.ParseToHttpRequestBytes(_options));
+            Assert.Throws<ArgumentNullException>(() => RequestParser.ParseToHttpRequestBytes(_options));
         }
 
         [Fact]

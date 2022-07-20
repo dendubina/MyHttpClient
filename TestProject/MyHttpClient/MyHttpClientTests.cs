@@ -14,13 +14,13 @@ namespace TestProject.MyHttpClient
 {
     public class MyHttpClientTests
     {
-        private readonly Mock<IConnection> _mockedConnection;
+        private readonly Mock<IConnectionHandler> _mockedConnection;
         private readonly RequestOptions _requestOptions;
         private readonly IMyHttpClient _httpClient;
 
         public MyHttpClientTests()
         {
-            _mockedConnection = new Mock<IConnection>();
+            _mockedConnection = new Mock<IConnectionHandler>();
 
             _httpClient = new MyHttpClientProject.MyHttpClient(_mockedConnection.Object);
 
@@ -34,6 +34,13 @@ namespace TestProject.MyHttpClient
                     {"Host", "google.com"},
                 }
             };
+        }
+
+        [Fact]
+        public void GetResponseAsync_Should_ThrowException_When_Parameter_Null()
+        {
+            //Act and Assert
+            Assert.ThrowsAsync<ArgumentNullException>(() => _httpClient.GetResponseAsync(null));
         }
 
         [Theory]

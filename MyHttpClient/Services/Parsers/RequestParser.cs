@@ -9,19 +9,24 @@ namespace MyHttpClientProject.Services.Parsers
     {
         public static byte[] ParseToHttpRequestBytes(RequestOptions options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options), "Request options must not be null");
+            }
+
             if (options.Method == null)
             {
-                throw new NullReferenceException("Method must not be null");
+                throw new ArgumentNullException(nameof(options),"Method must not be null");
             }
 
             if (options.Uri == null)
             {
-                throw new NullReferenceException("Uri must not be null");
+                throw new ArgumentNullException(nameof(options), "Uri must not be null");
             }
 
             if (options.Headers == null)
             {
-                throw new NullReferenceException("Headers must not be null");
+                throw new ArgumentNullException(nameof(options), "Headers must not be null");
             }
 
             var headers = new StringBuilder();

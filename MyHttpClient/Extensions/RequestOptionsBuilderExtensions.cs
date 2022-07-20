@@ -36,7 +36,7 @@ namespace MyHttpClientProject.Extensions
 
                 if (item.Value < 1)
                 {
-                    result.Append($";q={item.Value.ToString("0.0", CultureInfo.InvariantCulture)}");
+                    result.Append($";q={item.Value.ToString(format: "0.0", CultureInfo.InvariantCulture)}");
                 }
 
                 if (!item.Equals(lastValue))
