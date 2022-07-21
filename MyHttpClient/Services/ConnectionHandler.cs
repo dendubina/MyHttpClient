@@ -11,6 +11,9 @@ namespace MyHttpClientProject.Services
 {
     public class ConnectionHandler : IConnectionHandler
     {
+        private readonly IClient _client;
+        private int receiveBufferSize = 8192;
+
         public int ReceiveTimeout { get; set; }
         public int SendTimeout { get; set; }
 
@@ -19,9 +22,6 @@ namespace MyHttpClientProject.Services
             get => receiveBufferSize; 
             set => receiveBufferSize = value > 0 ? value : throw new ArgumentException("Value must be > 0");
         }
-
-        private int receiveBufferSize = 8192;
-        private readonly IClient _client;
 
         public ConnectionHandler() : this(new MyTcpClient())
         {
@@ -45,9 +45,9 @@ namespace MyHttpClientProject.Services
                 throw new ArgumentNullException(nameof(data), "Data must not be null");
             }
 
-            if (!_client.Connected(address, port))
+            if (!_client.IsConnected(address, port))
             {
-                _client.OpenNewConnection(address, port, SendTimeout, ReceiveTimeout);
+                _client.OpenConnection(address, port, SendTimeout, ReceiveTimeout);
             }
 
             var dataArray = data.ToArray();
@@ -58,6 +58,7 @@ namespace MyHttpClientProject.Services
         public IEnumerable<byte> ReadHeaders()
         {
             var stream = _client.GetStream();
+            var networkStream = stream as NetworkStream;
 
             if (!stream.CanRead)
             {
@@ -73,7 +74,7 @@ namespace MyHttpClientProject.Services
             {
                 var current = stream.ReadByte();
 
-                if (current == -1 || stream is NetworkStream { DataAvailable: false })
+                if (current == -1 || networkStream is { DataAvailable: false })
                 {
                     throw new InvalidOperationException("Invalid response");
                 }

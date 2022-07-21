@@ -6,8 +6,8 @@ namespace MyHttpClientProject.Services.Interfaces
     public interface IClient
     {
         Stream GetStream();
-        bool Connected(string address, ushort port);
-        void OpenNewConnection(string address, ushort port, int sendTimeout, int receiveTimeout);
+        bool IsConnected(string address, ushort port);
+        void OpenConnection(string address, ushort port, int sendTimeout, int receiveTimeout);
         void CloseConnection();
     }
 }

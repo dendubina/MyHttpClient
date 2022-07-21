@@ -118,7 +118,7 @@ namespace TestProject.Builders
         [Theory]
         [InlineData(1)]
         [InlineData(int.MaxValue)]
-        public void SetReceiveTimeout_And_SetSendTimeout_Should_Set_Value_To_RequestOptions_Property_When_Valid_Parameter(int milliseconds)
+        public void SetReceiveTimeoutShould_Set_Value_To_RequestOptions_Property_When_Valid_Parameter(int milliseconds)
         {
             //Act 
             var options = _builderWithRequiredValues

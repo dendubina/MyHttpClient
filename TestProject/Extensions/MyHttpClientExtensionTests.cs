@@ -16,14 +16,13 @@ namespace TestProject.Extensions
 {
     public class MyHttpClientExtensionTests
     {
-        private const HttpStatusCode ExpectedStatusCode = HttpStatusCode.OK;
-        private const string ExampleUri = "http://google.com";
-        private const string ExpectedResponseContent = "example content";
+        private const HttpStatusCode ExpectedSuccessStatusCode = HttpStatusCode.OK;
+        private const string SomeTestUri = "http://google.com";
 
-        private static readonly IHttpBody _exampleRequestContent = new StringBody("request content");
+        private static readonly IHttpBody _someRequestContent = new StringBody("request content");
 
         private static readonly IEnumerable<byte> _expectedResponseContentBytes =
-            Encoding.UTF8.GetBytes(ExpectedResponseContent);
+            Encoding.UTF8.GetBytes("example content");
 
         private static readonly IDictionary<string, string> _expectedHeaders = new Dictionary<string, string>
         {
@@ -33,7 +32,7 @@ namespace TestProject.Extensions
         };
 
         private static readonly string _responseHeadersString =
-            $"HTTP/1.1 {(int)ExpectedStatusCode} OK{Environment.NewLine}" +
+            $"HTTP/1.1 {(int)ExpectedSuccessStatusCode} OK{Environment.NewLine}" +
             $"Connection: keep-alive{Environment.NewLine}" +
             $"Server: gws{Environment.NewLine}" +
             $"Content-Length: {_expectedResponseContentBytes.Count()}{Environment.NewLine}";
@@ -50,7 +49,7 @@ namespace TestProject.Extensions
 
             mockedConnection
                 .Setup(x => x.ReadBodyAsync(It.IsAny<int>()))
-                .ReturnsAsync(Encoding.UTF8.GetBytes(ExpectedResponseContent));
+                .ReturnsAsync(_expectedResponseContentBytes);
 
             _httpClient = new MyHttpClientProject.MyHttpClient(mockedConnection.Object);
         }
@@ -59,31 +58,31 @@ namespace TestProject.Extensions
         public async void GetAsync_Returns_Expected_HttpResponse()
         {
             //Act
-            var actualResponse = await _httpClient.GetAsync(ExampleUri);
+            var actualResponse = await _httpClient.GetAsync(SomeTestUri);
 
             //Assert
-            actualResponse.StatusCode.Should().Be(ExpectedStatusCode);
+            actualResponse.StatusCode.Should().Be(ExpectedSuccessStatusCode);
             actualResponse.ResponseHeaders.Should().Equal(_expectedHeaders);
-            actualResponse.ResponseBody.Should().Equal(Encoding.UTF8.GetBytes(ExpectedResponseContent));
+            actualResponse.ResponseBody.Should().Equal(_expectedResponseContentBytes);
         }
 
         [Fact]
         public async void PostAsync_Returns_Expected_HttpResponse()
         {
             //Act
-            var actualResponse = await _httpClient.PostAsync(ExampleUri, _exampleRequestContent);
+            var actualResponse = await _httpClient.PostAsync(SomeTestUri, _someRequestContent);
 
             //Assert
-            actualResponse.StatusCode.Should().Be(ExpectedStatusCode);
+            actualResponse.StatusCode.Should().Be(ExpectedSuccessStatusCode);
             actualResponse.ResponseHeaders.Should().Equal(_expectedHeaders);
-            actualResponse.ResponseBody.Should().Equal(Encoding.UTF8.GetBytes(ExpectedResponseContent));
+            actualResponse.ResponseBody.Should().Equal(_expectedResponseContentBytes);
         }
 
         [Fact]
         public async void PostWithStringResponseAsync_Returns_Expected_String()
         {
             //Act
-            var actualResponse = await _httpClient.PostWithStringResponseAsync(ExampleUri, _exampleRequestContent);
+            var actualResponse = await _httpClient.PostWithStringResponseAsync(SomeTestUri, _someRequestContent);
 
             //Assert
             actualResponse.Should().Be(Encoding.UTF8.GetString(_expectedResponseContentBytes.ToArray()));
@@ -93,7 +92,7 @@ namespace TestProject.Extensions
         public async void PostWithByteArrayResponseAsync_Returns_Expected_ByteArray()
         {
             //Act
-            var actualResponse = await _httpClient.PostWithByteArrayResponseAsync(ExampleUri, _exampleRequestContent);
+            var actualResponse = await _httpClient.PostWithByteArrayResponseAsync(SomeTestUri, _someRequestContent);
 
             //Assert
             actualResponse.Should().Equal(_expectedResponseContentBytes.ToArray());
@@ -106,7 +105,7 @@ namespace TestProject.Extensions
             using var memoryStream = new MemoryStream();
 
             //Act
-            var actualResponse = await _httpClient.PostWithStreamResponseAsync(ExampleUri, _exampleRequestContent);
+            var actualResponse = await _httpClient.PostWithStreamResponseAsync(SomeTestUri, _someRequestContent);
             await actualResponse.CopyToAsync(memoryStream);
 
             //Assert

@@ -9,14 +9,14 @@ namespace MyHttpClientProject.HttpBody
 {
     public class MultipartFormDataBody : IHttpBody
     {
+        private readonly IList<DataItem> _dataItems = new List<DataItem>();
+
         private struct DataItem
         {
             public IHttpBody Data { get; init; }
             public string FieldName { get; init; }
             public string FileName { get; init; }
         }
-
-        private readonly IList<DataItem> _dataItems = new List<DataItem>();
 
         public string Boundary { get; }
 

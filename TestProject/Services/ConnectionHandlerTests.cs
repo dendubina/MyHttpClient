@@ -13,8 +13,8 @@ namespace TestProject.Services
 {
     public class ConnectionHandlerTests
     {
-        private const ushort ExamplePort = 1;
-        private const string ExampleAddress = "google.com";
+        private const ushort SomeTestPort = 1;
+        private const string SomeTestAddress = "google.com";
 
         private readonly Mock<IClient> _mockClient;
         private readonly IConnectionHandler _connectionHandler;
@@ -32,7 +32,7 @@ namespace TestProject.Services
         public void SendAsync_Should_ThrowException_When_Address_Invalid(string address)
         {
             //Act
-            Func<Task> act = () => _connectionHandler.SendAsync(address, ExamplePort, new byte[] { 1, 2, 3 });
+            Func<Task> act = () => _connectionHandler.SendAsync(address, SomeTestPort, new byte[] { 1, 2, 3 });
 
             //Assert
             act.Should().ThrowAsync<ArgumentException>();
@@ -42,7 +42,7 @@ namespace TestProject.Services
         public void SendAsync_Should_ThrowException_When_Data_Null()
         {
             //Act
-            Func<Task> act = () => _connectionHandler.SendAsync(ExampleAddress, ExamplePort, null);
+            Func<Task> act = () => _connectionHandler.SendAsync(SomeTestAddress, SomeTestPort, null);
 
             //Assert
             act.Should().ThrowAsync<ArgumentNullException>();
@@ -55,15 +55,15 @@ namespace TestProject.Services
             var exampleData = new byte[] { 1, 2, 3 };
 
             _mockClient
-                .Setup(x => x.Connected(It.IsAny<string>(), It.IsAny<ushort>()))
+                .Setup(x => x.IsConnected(It.IsAny<string>(), It.IsAny<ushort>()))
                 .Returns(false);
 
             //Act
-            _connectionHandler.SendAsync(ExampleAddress, ExamplePort, exampleData);
+            _connectionHandler.SendAsync(SomeTestAddress, SomeTestPort, exampleData);
 
             //Assert
             _mockClient.Verify(x => 
-                x.OpenNewConnection(It.IsAny<string>(), It.IsAny<ushort>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+                x.OpenConnection(It.IsAny<string>(), It.IsAny<ushort>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
         }
 
         [Fact]
@@ -78,14 +78,14 @@ namespace TestProject.Services
                 .Returns(stream);
 
             //Act 
-            await _connectionHandler.SendAsync(ExampleAddress, ExamplePort, data);
+            await _connectionHandler.SendAsync(SomeTestAddress, SomeTestPort, data);
 
             //Assert
             stream.ToArray().Should().Equal(data);
         }
 
         [Fact]
-        public void ReadHeaders_Should_ThrowException_When_Cant_Read()
+        public void ReadHeaders_Should_ThrowException_When_Cannot_Read()
         {
             //Arrange
             var stream = new MemoryStream();
@@ -133,9 +133,9 @@ namespace TestProject.Services
         {
             //Arrange
             var expectedHeaders = Encoding.UTF8.GetBytes(
-                  $"HTTP/1.1 200 OK{Environment.NewLine}" +
-                    $"Server: Apache{Environment.NewLine}" +
-                    $"{Environment.NewLine}");
+                $"HTTP/1.1 200 OK{Environment.NewLine}" +
+                  $"Server: Apache{Environment.NewLine}" +
+                  $"{Environment.NewLine}");
 
             var responseBody = Encoding.UTF8.GetBytes("example body");
 
@@ -158,7 +158,7 @@ namespace TestProject.Services
         [InlineData(1)]
         [InlineData(10)]
         [InlineData(int.MaxValue)]
-        public void ReadBodyAsync_Should_ThrowException_When_Cant_Read(int bodyLength)
+        public void ReadBodyAsync_Should_ThrowException_When_Cannot_Read(int bodyLength)
         {
             //Arrange
             var stream = new MemoryStream();
@@ -189,7 +189,7 @@ namespace TestProject.Services
         }
 
         [Fact]
-        public void ReadBodyAsync_Should_ThrowException_When_Parameter_Doesnt_Equal_Actual_Response()
+        public void ReadBodyAsync_Should_ThrowException_When_Parameter_Not_Equal_Actual_Response()
         {
             //Arrange
             var responseData = new byte[] { 1, 2, 3 };

@@ -14,10 +14,10 @@ namespace MyHttpClientProject.Services
         public Stream GetStream()
             => _tcpClient != null ? _tcpClient.GetStream() : throw new InvalidOperationException("Not Connected");
 
-        public bool Connected(string address, ushort port)
+        public bool IsConnected(string address, ushort port)
             => _tcpClient is not { Connected: false } && _connectionAddress == address && _connectionPort == port;
 
-        public void OpenNewConnection(string address, ushort port, int sendTimeout, int receiveTimeout)
+        public void OpenConnection(string address, ushort port, int sendTimeout, int receiveTimeout)
         {
             CloseConnection();
 
