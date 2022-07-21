@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using MyHttpClientProject.Services;
 using MyHttpClientProject.Services.Interfaces;
@@ -29,15 +31,21 @@ namespace TestProject.Services
         [InlineData("  ")]
         public void SendAsync_Should_ThrowException_When_Address_Invalid(string address)
         {
-            //Act and Assert
-            Assert.ThrowsAsync<ArgumentException>(() => _connectionHandler.SendAsync(address, ExamplePort, new byte[] { 1, 2, 3 }));
+            //Act
+            Func<Task> act = () => _connectionHandler.SendAsync(address, ExamplePort, new byte[] { 1, 2, 3 });
+
+            //Assert
+            act.Should().ThrowAsync<ArgumentException>();
         }
 
         [Fact]
         public void SendAsync_Should_ThrowException_When_Data_Null()
         {
-            //Act and Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => _connectionHandler.SendAsync(ExampleAddress, ExamplePort, null));
+            //Act
+            Func<Task> act = () => _connectionHandler.SendAsync(ExampleAddress, ExamplePort, null);
+
+            //Assert
+            act.Should().ThrowAsync<ArgumentNullException>();
         }
 
         [Fact]
@@ -73,7 +81,7 @@ namespace TestProject.Services
             await _connectionHandler.SendAsync(ExampleAddress, ExamplePort, data);
 
             //Assert
-            Assert.Equal(data, stream.ToArray());
+            stream.ToArray().Should().Equal(data);
         }
 
         [Fact]
@@ -88,8 +96,11 @@ namespace TestProject.Services
 
             stream.Close();
 
-            //Act and Assert
-            Assert.Throws<InvalidOperationException>(() => _connectionHandler.ReadHeaders());
+            //Act
+            Action act = () => _connectionHandler.ReadHeaders();
+
+            //Assert
+            act.Should().Throw<InvalidOperationException>();
         }
 
         [Theory]
@@ -110,8 +121,11 @@ namespace TestProject.Services
                 .Setup(x => x.GetStream())
                 .Returns(stream);
 
-            //Act and Assert
-            Assert.Throws<InvalidOperationException>(() => _connectionHandler.ReadHeaders());
+            //Act
+            Action act = () => _connectionHandler.ReadHeaders();
+
+            //Assert
+            act.Should().Throw<InvalidOperationException>();
         }
 
         [Fact]
@@ -134,10 +148,10 @@ namespace TestProject.Services
                 .Returns(stream);
 
             //Act
-            var actual = _connectionHandler.ReadHeaders();
+            var actualHeaders = _connectionHandler.ReadHeaders();
 
             //Assert
-            Assert.Equal(expectedHeaders, actual);
+            actualHeaders.Should().Equal(expectedHeaders);
         }
 
         [Theory]
@@ -155,8 +169,11 @@ namespace TestProject.Services
 
             stream.Close();
 
-            //Act and Assert
-            Assert.ThrowsAsync<InvalidOperationException>(() => _connectionHandler.ReadBodyAsync(bodyLength));
+            //Act
+            Func<Task> act = () => _connectionHandler.ReadBodyAsync(bodyLength);
+
+            //Assert
+            act.Should().ThrowAsync<InvalidOperationException>();
         }
 
         [Theory]
@@ -164,12 +181,15 @@ namespace TestProject.Services
         [InlineData(-1)]
         public void ReadBodyAsync_Should_ThrowException_When_BodyLength_Invalid(int bodyLength)
         {
-            //Act and Assert
-            Assert.ThrowsAsync<ArgumentException>(() => _connectionHandler.ReadBodyAsync(bodyLength));
+            //Act
+            Func<Task> act = () => _connectionHandler.ReadBodyAsync(bodyLength);
+
+            //Assert
+            act.Should().ThrowAsync<ArgumentException>();
         }
 
         [Fact]
-        public async void ReadBodyAsync_Should_ThrowException_When_Parameter_Doesnt_Equal_Actual_Response()
+        public void ReadBodyAsync_Should_ThrowException_When_Parameter_Doesnt_Equal_Actual_Response()
         {
             //Arrange
             var responseData = new byte[] { 1, 2, 3 };
@@ -181,28 +201,31 @@ namespace TestProject.Services
             _mockClient
                 .Setup(x => x.GetStream())
                 .Returns(stream);
-           
-            //Act and Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _connectionHandler.ReadBodyAsync(invalidLength));
+
+            //Act
+            Func<Task> act = () => _connectionHandler.ReadBodyAsync(invalidLength);
+
+            //Assert
+            act.Should().ThrowAsync<InvalidOperationException>();
         }
 
         [Fact]
         public async void ReadBodyAsync_Should_Return_Expected_Content_When_Valid_Response_And_Parameter()
         {
             //Arrange
-            var responseData = Encoding.UTF8.GetBytes("example content");
+            var expectedResponseData = Encoding.UTF8.GetBytes("example content");
 
-            using var stream = new MemoryStream(responseData);
+            using var stream = new MemoryStream(expectedResponseData);
 
             _mockClient
                 .Setup(x => x.GetStream())
                 .Returns(stream);
 
             //Act
-            var actual = await _connectionHandler.ReadBodyAsync(responseData.Length);
+            var actual = await _connectionHandler.ReadBodyAsync(expectedResponseData.Length);
 
             //Assert
-            Assert.Equal(responseData, actual);
+            actual.Should().Equal(expectedResponseData);
         }
 
         [Fact]

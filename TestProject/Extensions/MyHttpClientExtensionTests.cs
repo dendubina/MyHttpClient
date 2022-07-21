@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using FluentAssertions;
 using Moq;
 using MyHttpClientProject;
 using MyHttpClientProject.Extensions;
@@ -58,44 +59,44 @@ namespace TestProject.Extensions
         public async void GetAsync_Returns_Expected_HttpResponse()
         {
             //Act
-            var actual = await _httpClient.GetAsync(ExampleUri);
+            var actualResponse = await _httpClient.GetAsync(ExampleUri);
 
             //Assert
-            Assert.Equal(ExpectedStatusCode, actual.StatusCode);
-            Assert.Equal(_expectedHeaders, actual.ResponseHeaders);
-            Assert.Equal(Encoding.UTF8.GetBytes(ExpectedResponseContent), actual.ResponseBody.ToArray());
+            actualResponse.StatusCode.Should().Be(ExpectedStatusCode);
+            actualResponse.ResponseHeaders.Should().Equal(_expectedHeaders);
+            actualResponse.ResponseBody.Should().Equal(Encoding.UTF8.GetBytes(ExpectedResponseContent));
         }
 
         [Fact]
         public async void PostAsync_Returns_Expected_HttpResponse()
         {
             //Act
-            var actual = await _httpClient.PostAsync(ExampleUri, _exampleRequestContent);
+            var actualResponse = await _httpClient.PostAsync(ExampleUri, _exampleRequestContent);
 
             //Assert
-            Assert.Equal(ExpectedStatusCode, actual.StatusCode);
-            Assert.Equal(_expectedHeaders, actual.ResponseHeaders);
-            Assert.Equal(Encoding.UTF8.GetBytes(ExpectedResponseContent), actual.ResponseBody.ToArray());
+            actualResponse.StatusCode.Should().Be(ExpectedStatusCode);
+            actualResponse.ResponseHeaders.Should().Equal(_expectedHeaders);
+            actualResponse.ResponseBody.Should().Equal(Encoding.UTF8.GetBytes(ExpectedResponseContent));
         }
 
         [Fact]
         public async void PostWithStringResponseAsync_Returns_Expected_String()
         {
             //Act
-            var actual = await _httpClient.PostWithStringResponseAsync(ExampleUri, _exampleRequestContent);
+            var actualResponse = await _httpClient.PostWithStringResponseAsync(ExampleUri, _exampleRequestContent);
 
             //Assert
-            Assert.Equal(Encoding.UTF8.GetString(_expectedResponseContentBytes.ToArray()), actual);
+            actualResponse.Should().Be(Encoding.UTF8.GetString(_expectedResponseContentBytes.ToArray()));
         }
 
         [Fact]
         public async void PostWithByteArrayResponseAsync_Returns_Expected_ByteArray()
         {
             //Act
-            var actual = await _httpClient.PostWithByteArrayResponseAsync(ExampleUri, _exampleRequestContent);
+            var actualResponse = await _httpClient.PostWithByteArrayResponseAsync(ExampleUri, _exampleRequestContent);
 
             //Assert
-            Assert.Equal(_expectedResponseContentBytes.ToArray(), actual);
+            actualResponse.Should().Equal(_expectedResponseContentBytes.ToArray());
         }
 
         [Fact]
@@ -105,11 +106,11 @@ namespace TestProject.Extensions
             using var memoryStream = new MemoryStream();
 
             //Act
-            var actual = await _httpClient.PostWithStreamResponseAsync(ExampleUri, _exampleRequestContent);
-            await actual.CopyToAsync(memoryStream);
+            var actualResponse = await _httpClient.PostWithStreamResponseAsync(ExampleUri, _exampleRequestContent);
+            await actualResponse.CopyToAsync(memoryStream);
 
             //Assert
-            Assert.Equal(_expectedResponseContentBytes.ToArray(), memoryStream.ToArray());
+            memoryStream.ToArray().Should().Equal(_expectedResponseContentBytes.ToArray());
         }
     }
 }

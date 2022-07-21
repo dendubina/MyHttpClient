@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using FluentAssertions;
 using MyHttpClientProject.Builders;
 using MyHttpClientProject.Exceptions;
 using MyHttpClientProject.HttpBody;
@@ -29,8 +30,11 @@ namespace TestProject.Builders
             //Arrange
             _builder.SetMethod(HttpMethod.Get);
 
-            //Act and Assert
-            Assert.Throws<OptionsBuildingException>(() => _builder.Build());
+            //Act
+            Action act = () => _builder.Build();
+
+            //Assert
+            act.Should().Throw<OptionsBuildingException>();
         }
 
         [Fact]
@@ -39,8 +43,11 @@ namespace TestProject.Builders
             //Arrange
             _builder.SetUri("http://google.com");
 
-            //Act and Assert
-            Assert.Throws<OptionsBuildingException>(() => _builder.Build());
+            //Act
+            Action act = () => _builder.Build();
+
+            //Assert
+            act.Should().Throw<OptionsBuildingException>();
         }
 
         [Theory]
@@ -52,8 +59,11 @@ namespace TestProject.Builders
         [InlineData(null, "value")]
         public void AddHeader_Should_ThrowException_When_InvalidParameter(string name, string value)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(()=> _builder.AddHeader(name, value));
+            //Act
+            Action act = () => _builder.AddHeader(name, value);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -62,8 +72,11 @@ namespace TestProject.Builders
             //Arrange
             _builder.AddHeader("name", "value");
 
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => _builder.AddHeader("name", "value"));
+            //Act
+            Action act = () => _builder.AddHeader("name", "value");
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -75,7 +88,7 @@ namespace TestProject.Builders
                 .Build();
 
             //Assert
-            Assert.Contains(new KeyValuePair<string,string>("name", "value"), result.Headers);
+            result.Headers.Should().Contain(new KeyValuePair<string, string>("name", "value"));
         }
 
         [Theory]
@@ -83,8 +96,11 @@ namespace TestProject.Builders
         [InlineData(int.MinValue)]
         public void SetReceiveTimeout_Should_ThrowException_When_Invalid_Parameter(int milliseconds)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => _builder.SetReceiveTimeout(milliseconds));
+            //Act
+            Action act = () => _builder.SetReceiveTimeout(milliseconds);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -92,11 +108,12 @@ namespace TestProject.Builders
         [InlineData(int.MinValue)]
         public void SetSendTimeout_Should_ThrowException_When_Invalid_Parameter(int milliseconds)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => _builder.SetSendTimeout(milliseconds));
+            //Act
+            Action act = () => _builder.SetSendTimeout(milliseconds);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
-
-
 
         [Theory]
         [InlineData(1)]
@@ -109,7 +126,7 @@ namespace TestProject.Builders
                 .Build();
 
             //Assert
-            Assert.Equal(milliseconds, options.ReceiveTimeout);
+            options.ReceiveTimeout.Should().Be(milliseconds);
         }
 
         [Theory]
@@ -123,7 +140,7 @@ namespace TestProject.Builders
                 .Build();
 
             //Assert
-            Assert.Equal(milliseconds, options.SendTimeout);
+            options.SendTimeout.Should().Be(milliseconds);
         }
 
         [Fact]
@@ -133,7 +150,7 @@ namespace TestProject.Builders
             var result = _builderWithRequiredValues.Build();
 
             //Assert
-            Assert.Equal(result.Uri.Host, result.Headers["Host"]);
+            result.Headers["Host"].Should().Be(result.Uri.Host);
         }
 
         [Fact]
@@ -149,8 +166,8 @@ namespace TestProject.Builders
                 .Build();
 
             //Assert
-            Assert.Contains(result.Headers["Content-Length"], Encoding.UTF8.GetByteCount(content).ToString());
-            Assert.Contains(result.Headers["Content-Type"], $"{contentType}; charset=utf-8");
+            result.Headers["Content-Length"].Should().Be(Encoding.UTF8.GetByteCount(content).ToString());
+            result.Headers["Content-Type"].Should().Be($"{contentType}; charset=utf-8");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using FluentAssertions;
 using MyHttpClientProject.HttpBody;
 using Xunit;
 
@@ -13,8 +14,11 @@ namespace TestProject.HttpBody
         [InlineData("  ")]
         public void Constructor_Should_ThrowException_When_Content_Is_Not_Valid(string content)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => new StringBody(content));
+            //Act
+            Action act = () => new StringBody(content);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -26,8 +30,11 @@ namespace TestProject.HttpBody
         [InlineData("\r\n")]
         public void Constructor_Should_ThrowException_When_MediaType_Is_Invalid(string mediaType)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => new StringBody("content", Encoding.UTF8, mediaType));
+            //Act
+            Action act = () => new StringBody("content", Encoding.UTF8, mediaType);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -37,10 +44,10 @@ namespace TestProject.HttpBody
             string defaultMediaType = "text/plain; charset=utf-8";
 
             //Act
-            var body = new StringBody("content");
+            var actualBody = new StringBody("content");
 
             //Assert
-            Assert.Equal(defaultMediaType, body.MediaType);
+            actualBody.MediaType.Should().Be(defaultMediaType);
         }
 
         [Fact]
@@ -51,24 +58,24 @@ namespace TestProject.HttpBody
             string mediaType = "application/json";
 
             //Act
-            var body = new StringBody("content", encoding, mediaType);
+            var actualBody = new StringBody("content", encoding, mediaType);
 
             //Assert
-            Assert.Equal($"{mediaType}; charset={encoding.BodyName}", body.MediaType);
+            actualBody.MediaType.Should().Be($"{mediaType}; charset={encoding.BodyName}");
         }
 
         [Fact]
         public void GetContent_Should_Return_Expected_Content()
         {
             //Arrange
-            string content = "content";
-            var body = new StringBody(content);
+            string expectedContent = "content";
+            var body = new StringBody(expectedContent);
 
             //Act
-            var actual = body.GetContent();
+            var actualContent = body.GetContent();
 
             //Assert
-            Assert.Equal(Encoding.UTF8.GetBytes(content), actual);
+            actualContent.Should().Equal(Encoding.UTF8.GetBytes(expectedContent));
         }
     }
 }

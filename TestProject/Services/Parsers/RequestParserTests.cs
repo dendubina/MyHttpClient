@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using FluentAssertions;
 using MyHttpClientProject.HttpBody;
 using MyHttpClientProject.Models;
 using MyHttpClientProject.Services.Parsers;
@@ -31,8 +32,11 @@ namespace TestProject.Services.Parsers
         [Fact]
         public void ParseToHttpRequestBytes_Should_ThrowException_When_Parameter_Null()
         {
-            //Act and Assert
-            Assert.Throws<ArgumentNullException>(() => RequestParser.ParseToHttpRequestBytes(null));
+            //Act
+            Action act = () => RequestParser.ParseToHttpRequestBytes(null);
+
+            //Assert
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -41,8 +45,11 @@ namespace TestProject.Services.Parsers
             //Arrange
             _options.Method = null;
 
-            //Act and Assert
-            Assert.Throws<ArgumentNullException>(() => RequestParser.ParseToHttpRequestBytes(_options));
+            //Act
+            Action act = () => RequestParser.ParseToHttpRequestBytes(_options);
+
+            //Assert
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -50,9 +57,12 @@ namespace TestProject.Services.Parsers
         {
             //Arrange
             _options.Uri = null;
-            
-            //Act and Assert
-            Assert.Throws<ArgumentNullException>(() => RequestParser.ParseToHttpRequestBytes(_options));
+
+            //Act
+            Action act = () => RequestParser.ParseToHttpRequestBytes(_options);
+
+            //Assert
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -61,8 +71,11 @@ namespace TestProject.Services.Parsers
             //Arrange
             _options.Headers = null;
 
-            //Act and Assert
-            Assert.Throws<ArgumentNullException>(() => RequestParser.ParseToHttpRequestBytes(_options));
+            //Act
+            Action act = () => RequestParser.ParseToHttpRequestBytes(_options);
+
+            //Assert
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -86,7 +99,7 @@ namespace TestProject.Services.Parsers
             var actual = RequestParser.ParseToHttpRequestBytes(_options);
 
             //Assert
-            Assert.Equal(Encoding.UTF8.GetBytes(expected), actual);
+            actual.Should().Equal(Encoding.UTF8.GetBytes(expected));
         }
 
         [Fact]
@@ -101,7 +114,7 @@ namespace TestProject.Services.Parsers
             var actual = RequestParser.ParseToHttpRequestBytes(_options);
 
             //Assert
-            Assert.Equal(Encoding.UTF8.GetBytes(expected), actual);
+            actual.Should().Equal(Encoding.UTF8.GetBytes(expected));
         }
     }
 }

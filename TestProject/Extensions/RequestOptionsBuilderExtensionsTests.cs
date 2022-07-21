@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using FluentAssertions;
 using MyHttpClientProject.Builders;
 using MyHttpClientProject.Extensions;
 using Xunit;
@@ -27,7 +28,7 @@ namespace TestProject.Extensions
                 .Build();
 
             //Assert
-            Assert.Contains(new KeyValuePair<string, string>("Connection", "close"), result.Headers);
+            result.Headers.Should().Contain(new KeyValuePair<string, string>("Connection", "close"));
         }
 
         [Fact]
@@ -39,7 +40,7 @@ namespace TestProject.Extensions
                 .Build();
 
             //Assert
-            Assert.Contains(new KeyValuePair<string, string>("Connection", "keep-alive"), result.Headers);
+            result.Headers.Should().Contain(new KeyValuePair<string, string>("Connection", "keep-alive"));
         }
 
         [Theory]
@@ -49,8 +50,11 @@ namespace TestProject.Extensions
         [InlineData(-1)]
         public void SetAcceptHeader_Should_ThrowException_When_Invalid_QFactor_Value(double qFactor)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => _builder.SetAcceptHeader("mediaType", qFactor));
+            //Act
+            Action act = () => _builder.SetAcceptHeader("mediaType", qFactor);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -58,15 +62,21 @@ namespace TestProject.Extensions
         [InlineData("   ")]
         public void SetAcceptHeader_Should_ThrowException_When_Invalid_MediaType_Value(string mediaType)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => _builder.SetAcceptHeader(mediaType));
+            //Act
+            Action act = () => _builder.SetAcceptHeader(mediaType);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
         public void SetAcceptHeader_Should_ThrowException_When_MediaType_Null()
         {
-            //Act and Assert
-            Assert.Throws<ArgumentNullException>(() => _builder.SetAcceptHeader(mediaType: null));
+            //Act
+            Action act = () => _builder.SetAcceptHeader(mediaType: null);
+
+            //Assert
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -83,12 +93,12 @@ namespace TestProject.Extensions
             string expected = "mediaType2, mediaType3;q=0.8, mediaType1;q=0.5";
 
             //Act
-            var result = _builder
+            var actual = _builder
                 .SetAcceptHeader(parameters)
                 .Build();
 
             //Assert
-            Assert.Contains(new KeyValuePair<string, string>("Accept", expected), result.Headers);
+            actual.Headers.Should().Contain(new KeyValuePair<string, string>("Accept", expected));
         }
     }
 }

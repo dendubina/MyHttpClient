@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using FluentAssertions;
 using MyHttpClientProject.HttpBody;
 using Xunit;
 
@@ -17,14 +18,17 @@ namespace TestProject.HttpBody
             var expected = $"multipart/form-data;boundary=\"{_multipartBody.Boundary}\"";
 
             //Assert
-            Assert.Equal(expected, _multipartBody.MediaType);
+            _multipartBody.MediaType.Should().Be(expected);
         }
 
         [Fact]
         public void Add_Should_ThrowException_When_Body_Parameter_Null()
         {
-            //Act and Assert
-            Assert.Throws<ArgumentNullException>(() => _multipartBody.Add(null, "fieldName"));
+            //Act 
+            Action act = () => _multipartBody.Add(null, "fieldName");
+
+            //Assert
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Theory]
@@ -36,8 +40,11 @@ namespace TestProject.HttpBody
         [InlineData("\r\n")]
         public void Add_Should_ThrowException_When_FieldName_Not_Valid(string fieldName)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => _multipartBody.Add(new StringBody("content"), fieldName));
+            //Act 
+            Action act = () => _multipartBody.Add(new StringBody("content"), fieldName);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -48,15 +55,21 @@ namespace TestProject.HttpBody
         [InlineData("\r\n")]
         public void Add_Should_ThrowException_When_FileName_Not_Valid(string fileName)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => _multipartBody.Add(new StringBody("content"), "fieldName", fileName));
+            //Act
+            Action act = () => _multipartBody.Add(new StringBody("content"), "fieldName", fileName);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
         public void GetContent_Should_ThrowException_When_No_Body_Elements()
         {
-            //Act and Assert
-            Assert.Throws<InvalidOperationException>(() => _multipartBody.GetContent());
+            //Act
+            Action act = () => _multipartBody.GetContent();
+
+            //Assert
+            act.Should().Throw<InvalidOperationException>();
         }
 
         [Fact]
@@ -89,8 +102,11 @@ namespace TestProject.HttpBody
                 $"{secondContent}{Environment.NewLine}" +
                 $"--{_multipartBody.Boundary}--";
 
-            //Act and Assert
-            Assert.Equal(expected, Encoding.UTF8.GetString(_multipartBody.GetContent()));
+            //Act
+            var actual = Encoding.UTF8.GetString(_multipartBody.GetContent());
+
+            // Assert
+            actual.Should().Be(expected);
         }
     }
 }

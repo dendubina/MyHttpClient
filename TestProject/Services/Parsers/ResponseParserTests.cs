@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using FluentAssertions;
 using MyHttpClientProject.Services.Parsers;
 using Xunit;
 
@@ -18,8 +19,11 @@ namespace TestProject.Services.Parsers
         [InlineData(" ")]
         public void ParseFromBytes_Should_ThrowException_When_Invalid_Status_Line(string statusLine)
         {
-            //Act and Assert
-            Assert.Throws<FormatException>(() => ResponseParser.ParseFromBytes(_encoding.GetBytes(statusLine)));
+            //Act 
+            Action act = () => ResponseParser.ParseFromBytes(_encoding.GetBytes(statusLine));
+
+            //Assert
+            act.Should().Throw<FormatException>();
         }
 
         [Theory]
@@ -27,8 +31,11 @@ namespace TestProject.Services.Parsers
         [InlineData(new byte[]{})]
         public void ParseFromBytes_Should_ThrowException_When_NullOrEmpty_Data(byte[] data)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => ResponseParser.ParseFromBytes(data));
+            //Act 
+            Action act = () => ResponseParser.ParseFromBytes(data);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -37,8 +44,11 @@ namespace TestProject.Services.Parsers
             //Arrange
             const string responseWithNoHeaders = "HTTP/1.1 200 OK";
 
-            //Act and Assert
-            Assert.Throws<FormatException>(() => ResponseParser.ParseFromBytes(_encoding.GetBytes(responseWithNoHeaders)));
+            //Act
+            Action act = () => ResponseParser.ParseFromBytes(_encoding.GetBytes(responseWithNoHeaders));
+
+            //Assert
+            act.Should().Throw<FormatException>();
         }
 
         [Theory]
@@ -57,8 +67,11 @@ namespace TestProject.Services.Parsers
                                                $"Server: Apache{Environment.NewLine}" +
                                                invalidHeader;
 
-            //Act and Assert
-            Assert.Throws<FormatException>(() => ResponseParser.ParseFromBytes(_encoding.GetBytes(responseWithInvalidHeader)));
+            //Act
+            Action act = () => ResponseParser.ParseFromBytes(_encoding.GetBytes(responseWithInvalidHeader));
+
+            //Assert
+            act.Should().Throw<FormatException>();
         }
 
         [Fact]
@@ -70,18 +83,18 @@ namespace TestProject.Services.Parsers
                 { "Location", "http://www.google.com/" },
                 { "Connection", "close" },
             };
+
             string response = $"HTTP/1.1 301 Moved Permanently{Environment.NewLine}" + 
-                                      $"Location: http://www.google.com/{Environment.NewLine}" +
-                                      $"Connection: close{Environment.NewLine}" +
-                                      $"{Environment.NewLine}";
-                                     
+                              $"Location: http://www.google.com/{Environment.NewLine}" +
+                              $"Connection: close{Environment.NewLine}" +
+                              $"{Environment.NewLine}";
 
             //Act
-            var result = ResponseParser.ParseFromBytes(_encoding.GetBytes(response));
+            var actual = ResponseParser.ParseFromBytes(_encoding.GetBytes(response));
 
             //Assert
-            Assert.Equal(HttpStatusCode.Moved, result.StatusCode);
-            Assert.Equal(expectedHeaders, result.ResponseHeaders);
+            actual.StatusCode.Should().Be(HttpStatusCode.Moved);
+            actual.ResponseHeaders.Should().Equal(expectedHeaders);
         }
     }
 }

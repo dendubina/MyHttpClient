@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentAssertions;
 using MyHttpClientProject.HttpBody;
 using Xunit;
 
@@ -11,8 +12,11 @@ namespace TestProject.HttpBody
         [InlineData(new byte[]{})]
         public void Constructor_Should_ThrowException_When_Content_Is_Null_Or_Empty(byte[] content)
         {
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => new ByteArrayBody(content));
+            //Act
+            Action act = () => new ByteArrayBody(content);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -26,8 +30,11 @@ namespace TestProject.HttpBody
             //Arrange
             var content = new byte[] {1, 2, 3, 4, 5};
 
-            //Act and Assert
-            Assert.Throws<ArgumentException>(() => new ByteArrayBody(content, mediaType));
+            //Act 
+            Action act = () => new ByteArrayBody(content, mediaType);
+
+            //Assert
+            act.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -43,7 +50,7 @@ namespace TestProject.HttpBody
             var body = new ByteArrayBody(content, mediaType);
 
             //Assert
-            Assert.Equal(mediaType, body.MediaType);
+            mediaType.Should().Be(body.MediaType);
         }
 
         [Theory]
@@ -54,8 +61,11 @@ namespace TestProject.HttpBody
             //Arrange
             var body = new ByteArrayBody(content);
 
-            //Act and Assert
-            Assert.Equal(content, body.GetContent());
+            //Act
+            var actual = body.GetContent();
+
+            //Assert
+            actual.Should().Equal(content);
         }
     }
 }

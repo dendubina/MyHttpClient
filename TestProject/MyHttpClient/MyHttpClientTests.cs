@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using MyHttpClientProject;
 using MyHttpClientProject.Models;
@@ -37,10 +38,13 @@ namespace TestProject.MyHttpClient
         }
 
         [Fact]
-        public void GetResponseAsync_Should_ThrowException_When_Parameter_Null()
+        public void GetResponseAsync_Should_ThrowException_When_Parameter_NullAsync()
         {
-            //Act and Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => _httpClient.GetResponseAsync(null));
+            //Act
+            Func<Task> act = _httpClient.Awaiting(x => x.GetResponseAsync(null));
+
+            //Assert
+            act.Should().ThrowAsync<ArgumentNullException>();
         }
 
         [Theory]
@@ -139,12 +143,12 @@ namespace TestProject.MyHttpClient
                 .ReturnsAsync(Encoding.UTF8.GetBytes(content));
 
             //Act
-            var actual = await _httpClient.GetResponseAsync(_requestOptions);
+            var actualResponse = await _httpClient.GetResponseAsync(_requestOptions);
 
             //Assert
-            Assert.Equal(expectedStatusCode, actual.StatusCode);
-            Assert.Equal(expectedHeaders, actual.ResponseHeaders);
-            Assert.Equal(content, Encoding.UTF8.GetString(actual.ResponseBody.ToArray()));
+            actualResponse.StatusCode.Should().Be(expectedStatusCode);
+            actualResponse.ResponseHeaders.Should().Equal(expectedHeaders);
+            actualResponse.ResponseBody.Should().Equal(Encoding.UTF8.GetBytes(content));
         }
     }
 }
