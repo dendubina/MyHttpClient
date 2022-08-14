@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MyHttpClientProject.Services.Interfaces
 {
-    public interface IConnectionHandler
+    public interface IDataHandler
     {
         int SendTimeout { get; set; }
         int ReceiveTimeout { get; set; }

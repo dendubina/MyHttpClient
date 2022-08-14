@@ -9,20 +9,20 @@ using MyHttpClientProject.Services;
 using MyHttpClientProject.Services.Interfaces;
 using Xunit;
 
-namespace TestProject.Services
+namespace MyHttpClientProject.Tests.Services
 {
-    public class ConnectionHandlerTests
+    public class DataHandlerTests
     {
         private const ushort SomeTestPort = 1;
         private const string SomeTestAddress = "google.com";
 
-        private readonly Mock<IClient> _mockClient;
-        private readonly IConnectionHandler _connectionHandler;
+        private readonly Mock<IConnection> _mockClient;
+        private readonly IDataHandler _connectionHandler;
 
-        public ConnectionHandlerTests()
+        public DataHandlerTests()
         {
-            _mockClient = new Mock<IClient>();
-            _connectionHandler = new ConnectionHandler(_mockClient.Object);
+            _mockClient = new Mock<IConnection>();
+            _connectionHandler = new DataHandler(_mockClient.Object);
         }
 
         [Theory]

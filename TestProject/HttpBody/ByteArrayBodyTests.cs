@@ -3,7 +3,7 @@ using FluentAssertions;
 using MyHttpClientProject.HttpBody;
 using Xunit;
 
-namespace TestProject.HttpBody
+namespace MyHttpClientProject.Tests.HttpBody
 {
     public class ByteArrayBodyTests
     {

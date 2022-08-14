@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHttpClientProject", "MyHt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppForUsingClient", "AppForUsingClient\AppForUsingClient.csproj", "{B72A6C26-DA89-4304-911D-AB0DD8D454BC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject", "TestProject\TestProject.csproj", "{B32695C5-83FE-49BC-A27A-6AC537439043}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHttpClientProject.Tests", "TestProject\MyHttpClientProject.Tests.csproj", "{B32695C5-83FE-49BC-A27A-6AC537439043}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

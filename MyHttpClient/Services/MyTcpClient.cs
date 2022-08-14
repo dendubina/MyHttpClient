@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace MyHttpClientProject.Services
 {
-    public class MyTcpClient : IClient
+    public class MyTcpClient : IConnection
     {
         private TcpClient _tcpClient;
         private string _connectionAddress;

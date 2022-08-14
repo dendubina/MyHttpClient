@@ -8,7 +8,7 @@ namespace MyHttpClientProject.Builders
     {
         IRequestOptionsBuilder SetMethod(HttpMethod method);
         IRequestOptionsBuilder SetUri(string uri);
-        IRequestOptionsBuilder AddHeader(string name, string value);
+        IRequestOptionsBuilder AddOrChangeHeader(string name, string value);
         IRequestOptionsBuilder SetBody(IHttpBody body);
         IRequestOptionsBuilder SetPort(ushort port);
         IRequestOptionsBuilder SetSendTimeout(int milliseconds);

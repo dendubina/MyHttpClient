@@ -6,22 +6,21 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
-using MyHttpClientProject;
 using MyHttpClientProject.Models;
 using MyHttpClientProject.Services.Interfaces;
 using Xunit;
 
-namespace TestProject.MyHttpClient
+namespace MyHttpClientProject.Tests.MyHttpClient
 {
     public class MyHttpClientTests
     {
-        private readonly Mock<IConnectionHandler> _mockedConnection;
+        private readonly Mock<IDataHandler> _mockedConnection;
         private readonly RequestOptions _requestOptions;
         private readonly IMyHttpClient _httpClient;
 
         public MyHttpClientTests()
         {
-            _mockedConnection = new Mock<IConnectionHandler>();
+            _mockedConnection = new Mock<IDataHandler>();
 
             _httpClient = new MyHttpClientProject.MyHttpClient(_mockedConnection.Object);
 
@@ -41,7 +40,7 @@ namespace TestProject.MyHttpClient
         public void GetResponseAsync_Should_ThrowException_When_Parameter_NullAsync()
         {
             //Act
-            Func<Task> act = _httpClient.Awaiting(x => x.GetResponseAsync(null));
+            Func<Task> act = _httpClient.Awaiting(x => x.SendAsync(null));
 
             //Assert
             act.Should().ThrowAsync<ArgumentNullException>();
@@ -63,7 +62,7 @@ namespace TestProject.MyHttpClient
                 .Returns(Encoding.UTF8.GetBytes(responseWithConnectionCloseHeader));
 
             //Act
-            await _httpClient.GetResponseAsync(_requestOptions);
+            await _httpClient.SendAsync(_requestOptions);
 
             //Assert
             _mockedConnection.Verify(x => x.CloseConnection(), Times.Once);
@@ -86,7 +85,7 @@ namespace TestProject.MyHttpClient
                 .Returns(Encoding.UTF8.GetBytes(response));
 
             //Act
-            await _httpClient.GetResponseAsync(_requestOptions);
+            await _httpClient.SendAsync(_requestOptions);
 
             //Assert
             _mockedConnection.Verify(x => x.CloseConnection(), Times.Never);
@@ -106,7 +105,7 @@ namespace TestProject.MyHttpClient
                 .Returns(Encoding.UTF8.GetBytes(response));
 
             //Act
-            await _httpClient.GetResponseAsync(_requestOptions);
+            await _httpClient.SendAsync(_requestOptions);
 
             //Assert
             _mockedConnection.Verify(x => x.ReadBodyAsync(It.IsAny<int>()), Times.Never);
@@ -143,12 +142,12 @@ namespace TestProject.MyHttpClient
                 .ReturnsAsync(Encoding.UTF8.GetBytes(content));
 
             //Act
-            var actualResponse = await _httpClient.GetResponseAsync(_requestOptions);
+            var actualResponse = await _httpClient.SendAsync(_requestOptions);
 
             //Assert
             actualResponse.StatusCode.Should().Be(expectedStatusCode);
-            actualResponse.ResponseHeaders.Should().Equal(expectedHeaders);
-            actualResponse.ResponseBody.Should().Equal(Encoding.UTF8.GetBytes(content));
+            actualResponse.Headers.Should().Equal(expectedHeaders);
+            actualResponse.Body.Should().Equal(Encoding.UTF8.GetBytes(content));
         }
     }
 }

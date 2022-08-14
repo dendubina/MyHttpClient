@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,48 +12,50 @@ namespace MyHttpClientProject
 {
     public class MyHttpClient : IMyHttpClient
     {
-        private readonly IConnectionHandler _connection;
-        private static readonly SemaphoreSlim SemaphoreSlim = new(1,1);
+        private readonly IDataHandler _connection;
+        private static readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
-        public MyHttpClient() : this(new ConnectionHandler())
+        public MyHttpClient() : this(new DataHandler())
         {
 
         }
 
-        public MyHttpClient(IConnectionHandler connection)
+        public MyHttpClient(IDataHandler connection)
         {
             _connection = connection;
         }
 
-        public async Task<HttpResponse> GetResponseAsync(RequestOptions options)
+        public async Task<HttpResponse> SendAsync(RequestOptions options)
         {
             if (options == null)
             {
                 throw new ArgumentNullException(nameof(options), "Request options must not be null");
             }
 
-            var requestBytes = RequestParser.ParseToHttpRequestBytes(options);
+            var requestBytes = RequestConvertor.ParseToHttpRequestBytes(options);
 
-            await SemaphoreSlim.WaitAsync();
-
-            _connection.ReceiveTimeout = options.ReceiveTimeout;
-            _connection.SendTimeout = options.SendTimeout;
+            await _semaphoreSlim.WaitAsync();
 
             try
             {
+                _connection.ReceiveTimeout = options.ReceiveTimeout;
+                _connection.SendTimeout = options.SendTimeout;
 
                 await _connection.SendAsync(options.Uri.Host, options.Port, requestBytes);
 
                 var headers = _connection.ReadHeaders();
 
-                var parsedResponse = ResponseParser.ParseFromBytes(headers.ToArray());
+                var parsedResponse = ResponseHeadersParser.ParseFromBytes(headers.ToArray());
 
-                if (parsedResponse.ResponseHeaders.TryGetValue("Content-Length", out string lengthString) && int.TryParse(lengthString, out int parsedLength))
+                var caseInsensitiveDictionary = new Dictionary<string, string>(parsedResponse.Headers, StringComparer.OrdinalIgnoreCase);
+
+                if (caseInsensitiveDictionary.TryGetValue("Content-Length", out var lengthString) && int.TryParse(lengthString, out int parsedLength))
                 {
-                    parsedResponse.ResponseBody = await _connection.ReadBodyAsync(parsedLength);
+                    var body = await _connection.ReadBodyAsync(parsedLength);
+                    parsedResponse.Body = body.ToArray();
                 }
 
-                if (parsedResponse.ResponseHeaders.TryGetValue("Connection", out string value) && value.ToLowerInvariant() == "close")
+                if (caseInsensitiveDictionary.TryGetValue("Connection", out string value) && value is not null && value.ToLowerInvariant() == "close")
                 {
                     _connection.CloseConnection();
                 }
@@ -61,7 +64,7 @@ namespace MyHttpClientProject
             }
             finally
             {
-                SemaphoreSlim.Release();
+                _semaphoreSlim.Release();
             }
         }
 

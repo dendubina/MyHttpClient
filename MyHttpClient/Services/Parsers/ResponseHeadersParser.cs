@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using MyHttpClientProject.Models;
 
 namespace MyHttpClientProject.Services.Parsers
 {
-    public static class ResponseParser
+    public static class ResponseHeadersParser
     {
         public static HttpResponse ParseFromBytes(byte[] data)
         {
@@ -18,10 +19,16 @@ namespace MyHttpClientProject.Services.Parsers
 
             var dataStringArray = Encoding.UTF8.GetString(data).Split(Environment.NewLine);
 
+            var statusLine = dataStringArray.First();
+
+            var headers = dataStringArray
+                .Skip(1)
+                .TakeWhile(x => !string.IsNullOrWhiteSpace(x));
+
             var result = new HttpResponse
             {
-                StatusCode = GetStatusCode(dataStringArray.First()),
-                ResponseHeaders = GetHeaders(dataStringArray)
+                StatusCode = GetStatusCode(statusLine),
+                Headers = GetHeaders(headers)
             };
 
             return result;
@@ -42,38 +49,21 @@ namespace MyHttpClientProject.Services.Parsers
             return statusCode;
         }
 
-        private static IDictionary<string, string> GetHeaders(IEnumerable<string> data)
+        private static IDictionary<string, string> GetHeaders(IEnumerable<string> headers)
         {
             var result = new Dictionary<string, string>();
-
-            var headers = data
-                .Skip(1)
-                .TakeWhile(x => !string.IsNullOrWhiteSpace(x))
-                .ToArray();
-
-            if (!headers.Any())
-            {
-                throw new FormatException("No headers found");
-            }
+            var regex = new Regex(@"(\S+):\s(\S+)");
 
             foreach (var line in headers)
             {
-                int separatorIndex = line.IndexOf(':', StringComparison.Ordinal);
+                var match = regex.Match(line);
 
-                if (separatorIndex <= 0 || line.Length <= separatorIndex + 2)
+                if (!match.Success)
                 {
                     throw new FormatException($"Invalid header found: {line}");
                 }
 
-                var name = line[..separatorIndex].Trim();
-                var value = line[(separatorIndex + 2)..].Trim();
-
-                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(value))
-                {
-                    throw new FormatException($"Invalid header found: {line}");
-                }
-
-                result.Add(name, value);
+                result.Add(match.Groups[1].ToString(), match.Groups[2].ToString());
             }
 
             return result;

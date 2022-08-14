@@ -6,7 +6,7 @@ using FluentAssertions;
 using MyHttpClientProject.Services.Parsers;
 using Xunit;
 
-namespace TestProject.Services.Parsers
+namespace MyHttpClientProject.Tests.Services.Parsers
 {
     public class ResponseParserTests
     {
@@ -20,7 +20,7 @@ namespace TestProject.Services.Parsers
         public void ParseFromBytes_Should_ThrowException_When_Invalid_Status_Line(string statusLine)
         {
             //Act 
-            Action act = () => ResponseParser.ParseFromBytes(_encoding.GetBytes(statusLine));
+            Action act = () => ResponseHeadersParser.ParseFromBytes(_encoding.GetBytes(statusLine));
 
             //Assert
             act.Should().Throw<FormatException>();
@@ -32,7 +32,7 @@ namespace TestProject.Services.Parsers
         public void ParseFromBytes_Should_ThrowException_When_NullOrEmpty_Data(byte[] data)
         {
             //Act 
-            Action act = () => ResponseParser.ParseFromBytes(data);
+            Action act = () => ResponseHeadersParser.ParseFromBytes(data);
 
             //Assert
             act.Should().Throw<ArgumentException>();
@@ -45,7 +45,7 @@ namespace TestProject.Services.Parsers
             const string responseWithNoHeaders = "HTTP/1.1 200 OK";
 
             //Act
-            Action act = () => ResponseParser.ParseFromBytes(_encoding.GetBytes(responseWithNoHeaders));
+            Action act = () => ResponseHeadersParser.ParseFromBytes(_encoding.GetBytes(responseWithNoHeaders));
 
             //Assert
             act.Should().Throw<FormatException>();
@@ -68,7 +68,7 @@ namespace TestProject.Services.Parsers
                                                invalidHeader;
 
             //Act
-            Action act = () => ResponseParser.ParseFromBytes(_encoding.GetBytes(responseWithInvalidHeader));
+            Action act = () => ResponseHeadersParser.ParseFromBytes(_encoding.GetBytes(responseWithInvalidHeader));
 
             //Assert
             act.Should().Throw<FormatException>();
@@ -90,11 +90,11 @@ namespace TestProject.Services.Parsers
                               $"{Environment.NewLine}";
 
             //Act
-            var actual = ResponseParser.ParseFromBytes(_encoding.GetBytes(response));
+            var actual = ResponseHeadersParser.ParseFromBytes(_encoding.GetBytes(response));
 
             //Assert
             actual.StatusCode.Should().Be(HttpStatusCode.Moved);
-            actual.ResponseHeaders.Should().Equal(expectedHeaders);
+            actual.Headers.Should().Equal(expectedHeaders);
         }
     }
 }

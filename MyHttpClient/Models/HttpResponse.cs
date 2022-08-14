@@ -7,8 +7,8 @@ namespace MyHttpClientProject.Models
     {
         public HttpStatusCode StatusCode { get; set; }
 
-        public IDictionary<string, string> ResponseHeaders { get; set; }
+        public IDictionary<string, string> Headers { get; set; }
 
-        public IEnumerable<byte> ResponseBody { get; set; }
+        public byte[] Body { get; set; }
     }
 }

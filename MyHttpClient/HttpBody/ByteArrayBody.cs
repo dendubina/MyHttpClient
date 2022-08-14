@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using MyHttpClientProject.Extensions;
 
 namespace MyHttpClientProject.HttpBody
@@ -11,12 +10,7 @@ namespace MyHttpClientProject.HttpBody
 
         public ByteArrayBody(byte[] content) 
         {
-            if (content is null || !content.Any())
-            {
-                throw new ArgumentException("Content must not be null or empty");
-            }
-
-            _content = content;
+            _content = content ?? throw new ArgumentException("Content must not be null");
         }
 
         public ByteArrayBody(byte[] content, string mediaType) : this(content)

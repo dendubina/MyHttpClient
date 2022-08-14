@@ -17,6 +17,11 @@ namespace MyHttpClientProject.Extensions
 
         public static IRequestOptionsBuilder SetAcceptHeader(this IRequestOptionsBuilder builder, IDictionary<string, double> mediaTypesWithQFactor)
         {
+            if (!mediaTypesWithQFactor.Any())
+            {
+                throw new ArgumentException("mediaTypesWithQFactor is empty");
+            }
+
             if (mediaTypesWithQFactor.Values.Any(x => x is > 1 or < 0))
             {
                 throw new ArgumentException("Invalid q-factor value");
@@ -45,13 +50,13 @@ namespace MyHttpClientProject.Extensions
                 }
             }
 
-            builder.AddHeader("Accept", result.ToString());
+            builder.AddOrChangeHeader("Accept", result.ToString());
 
             return builder;
         }
 
 
         public static IRequestOptionsBuilder SetConnectionHeader(this IRequestOptionsBuilder builder, bool closeConnection) =>
-            builder.AddHeader("Connection", closeConnection ? "close" : "keep-alive");
+            builder.AddOrChangeHeader("Connection", closeConnection ? "close" : "keep-alive");
     }
 }

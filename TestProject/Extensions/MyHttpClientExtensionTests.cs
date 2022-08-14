@@ -6,13 +6,12 @@ using System.Net;
 using System.Text;
 using FluentAssertions;
 using Moq;
-using MyHttpClientProject;
 using MyHttpClientProject.Extensions;
 using MyHttpClientProject.HttpBody;
 using MyHttpClientProject.Services.Interfaces;
 using Xunit;
 
-namespace TestProject.Extensions
+namespace MyHttpClientProject.Tests.Extensions
 {
     public class MyHttpClientExtensionTests
     {
@@ -41,7 +40,7 @@ namespace TestProject.Extensions
 
         public MyHttpClientExtensionTests()
         {
-            var mockedConnection = new Mock<IConnectionHandler>();
+            var mockedConnection = new Mock<IDataHandler>();
 
             mockedConnection
                 .Setup(x => x.ReadHeaders())
@@ -62,8 +61,8 @@ namespace TestProject.Extensions
 
             //Assert
             actualResponse.StatusCode.Should().Be(ExpectedSuccessStatusCode);
-            actualResponse.ResponseHeaders.Should().Equal(_expectedHeaders);
-            actualResponse.ResponseBody.Should().Equal(_expectedResponseContentBytes);
+            actualResponse.Headers.Should().Equal(_expectedHeaders);
+            actualResponse.Body.Should().Equal(_expectedResponseContentBytes);
         }
 
         [Fact]
@@ -74,8 +73,8 @@ namespace TestProject.Extensions
 
             //Assert
             actualResponse.StatusCode.Should().Be(ExpectedSuccessStatusCode);
-            actualResponse.ResponseHeaders.Should().Equal(_expectedHeaders);
-            actualResponse.ResponseBody.Should().Equal(_expectedResponseContentBytes);
+            actualResponse.Headers.Should().Equal(_expectedHeaders);
+            actualResponse.Body.Should().Equal(_expectedResponseContentBytes);
         }
 
         [Fact]

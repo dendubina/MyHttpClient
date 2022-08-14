@@ -6,7 +6,7 @@ using MyHttpClientProject.Builders;
 using MyHttpClientProject.Extensions;
 using Xunit;
 
-namespace TestProject.Extensions
+namespace MyHttpClientProject.Tests.Extensions
 {
     public class RequestOptionsBuilderExtensionsTests
     {

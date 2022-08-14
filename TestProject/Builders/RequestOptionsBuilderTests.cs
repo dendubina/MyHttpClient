@@ -8,7 +8,7 @@ using MyHttpClientProject.Exceptions;
 using MyHttpClientProject.HttpBody;
 using Xunit;
 
-namespace TestProject.Builders
+namespace MyHttpClientProject.Tests.Builders
 {
     public class RequestOptionsBuilderTests
     {
@@ -60,7 +60,7 @@ namespace TestProject.Builders
         public void AddHeader_Should_ThrowException_When_InvalidParameter(string name, string value)
         {
             //Act
-            Action act = () => _builder.AddHeader(name, value);
+            Action act = () => _builder.AddOrChangeHeader(name, value);
 
             //Assert
             act.Should().Throw<ArgumentException>();
@@ -70,10 +70,10 @@ namespace TestProject.Builders
         public void AddHeader_Should_ThrowException_When_Adding_Header_With_Same_Name_Twice()
         {
             //Arrange
-            _builder.AddHeader("name", "value");
+            _builder.AddOrChangeHeader("name", "value");
 
             //Act
-            Action act = () => _builder.AddHeader("name", "value");
+            Action act = () => _builder.AddOrChangeHeader("name", "value");
 
             //Assert
             act.Should().Throw<ArgumentException>();
@@ -84,7 +84,7 @@ namespace TestProject.Builders
         {
             //Act
             var result = _builderWithRequiredValues
-                .AddHeader("name", "value")
+                .AddOrChangeHeader("name", "value")
                 .Build();
 
             //Assert

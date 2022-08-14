@@ -18,7 +18,7 @@ namespace MyHttpClientProject.Extensions
                 .SetUri(uri)
                 .Build();
 
-            return await client.GetResponseAsync(requestOptions);
+            return await client.SendAsync(requestOptions);
         }
 
         public static async Task<HttpResponse> PostAsync<THttpBody>(this IMyHttpClient client, string uri, THttpBody body)
@@ -30,7 +30,7 @@ namespace MyHttpClientProject.Extensions
                 .SetBody(body)
                 .Build();
 
-            return await client.GetResponseAsync(requestOptions);
+            return await client.SendAsync(requestOptions);
         }
 
         public static async Task<string> PostWithStringResponseAsync<THttpBody>(this IMyHttpClient client, string uri, THttpBody body)
@@ -38,7 +38,7 @@ namespace MyHttpClientProject.Extensions
         {
             var response = await PostAsync(client, uri, body);
 
-            return Encoding.UTF8.GetString(response.ResponseBody.ToArray());
+            return Encoding.UTF8.GetString(response.Body.ToArray());
         }
 
         public static async Task<byte[]> PostWithByteArrayResponseAsync<THttpBody>(this IMyHttpClient client, string uri, THttpBody body)
@@ -46,7 +46,7 @@ namespace MyHttpClientProject.Extensions
         {
             var response = await PostAsync(client, uri, body);
 
-            return response.ResponseBody.ToArray();
+            return response.Body.ToArray();
         }
 
         public static async Task<Stream> PostWithStreamResponseAsync<THttpBody>(this IMyHttpClient client, string uri, THttpBody body)
@@ -54,7 +54,7 @@ namespace MyHttpClientProject.Extensions
         {
             var response = await PostAsync(client, uri, body);
 
-            return new MemoryStream(response.ResponseBody.ToArray());
+            return new MemoryStream(response.Body.ToArray());
         }
     }
 }

@@ -9,26 +9,26 @@ using MyHttpClientProject.Services.Interfaces;
 
 namespace MyHttpClientProject.Services
 {
-    public class ConnectionHandler : IConnectionHandler
+    public class DataHandler : IDataHandler
     {
-        private readonly IClient _client;
-        private int receiveBufferSize = 8192;
+        private readonly IConnection _client;
+        private int _receiveBufferSize = 8192;
 
         public int ReceiveTimeout { get; set; }
         public int SendTimeout { get; set; }
 
         public int ReceiveBufferSize
         {
-            get => receiveBufferSize; 
-            set => receiveBufferSize = value > 0 ? value : throw new ArgumentException("Value must be > 0");
+            get => _receiveBufferSize; 
+            set => _receiveBufferSize = value > 0 ? value : throw new ArgumentException("Value must be > 0");
         }
 
-        public ConnectionHandler() : this(new MyTcpClient())
+        public DataHandler() : this(new MyTcpClient())
         {
             
         }
 
-        public ConnectionHandler(IClient client)
+        public DataHandler(IConnection client)
         {
             _client = client;
         }
@@ -86,11 +86,6 @@ namespace MyHttpClientProject.Services
                     .SequenceEqual(sequenceToFind);
             }
 
-            if (result.Count == sequenceToFind.Length)
-            {
-                throw new InvalidOperationException("Response has no data");
-            }
-            
             return result;
         }
 
@@ -116,7 +111,7 @@ namespace MyHttpClientProject.Services
             { 
                 var bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
 
-                if (bytesRead == 0)
+                if (bytesRead <= 0)
                 {
                     throw new InvalidOperationException("Invalid response body length or response has no data");
                 }

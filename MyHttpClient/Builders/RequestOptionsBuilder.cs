@@ -10,6 +10,10 @@ namespace MyHttpClientProject.Builders
 {
     public class RequestOptionsBuilder : IRequestOptionsBuilder
     {
+        private const string ContentLengthHeaderName = "Content-Length";
+        private const string ContentTypeHeaderName = "Content-Type";
+        private const string HostHeaderName = "Host";
+
         private RequestOptions _options = new();
 
         public IRequestOptionsBuilder SetUri(string uri)
@@ -26,7 +30,7 @@ namespace MyHttpClientProject.Builders
             return this;
         }
 
-        public IRequestOptionsBuilder AddHeader(string name, string value)
+        public IRequestOptionsBuilder AddOrChangeHeader(string name, string value)
         {
             if (string.IsNullOrWhiteSpace(name) || name.ContainsNewLine())
             {
@@ -38,9 +42,16 @@ namespace MyHttpClientProject.Builders
                 throw new ArgumentException("Invalid header value format", nameof(value));
             }
 
-            _options.Headers ??= new Dictionary<string, string>();
+            _options.Headers ??= new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
-            _options.Headers.Add(name, value);
+            if (_options.Headers.ContainsKey(name))
+            {
+                _options.Headers[name] = value;
+            }
+            else
+            {
+                _options.Headers.Add(name, value);
+            }
 
             return this;
         }
@@ -87,21 +98,18 @@ namespace MyHttpClientProject.Builders
         {
             ValidateRequiredValues();
 
-            _options.Headers ??= new Dictionary<string, string>();
-
             if (_options.Port == 0)
             {
                 SetPort(80);
             }
 
+            _options.Headers ??= new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+
             AddRepresentationHeaders();
 
             AddHostHeader();
 
-            var result = _options;
-            _options = new RequestOptions();
-
-            return result;
+            return _options;
         }
 
         private void ValidateRequiredValues()
@@ -124,22 +132,22 @@ namespace MyHttpClientProject.Builders
                 return;
             }
 
-            if (_options.Body.MediaType != null && !_options.Headers.ContainsKey("Content-Type"))
+            if (_options.Body.MediaType != null && !_options.Headers.ContainsKey(ContentTypeHeaderName))
             {
-                AddHeader("Content-Type", _options.Body.MediaType);
+                AddOrChangeHeader(ContentTypeHeaderName, _options.Body.MediaType);
             }
 
-            if (!_options.Headers.ContainsKey("Content-Length"))
+            if (!_options.Headers.ContainsKey(ContentLengthHeaderName))
             {
-                AddHeader("Content-Length", _options.Body.GetContent().Length.ToString());
+                AddOrChangeHeader(ContentLengthHeaderName, _options.Body.GetContent().Length.ToString());
             }
         }
 
         private void AddHostHeader()
         {
-            if (!_options.Headers.ContainsKey("Host"))
+            if (!_options.Headers.ContainsKey(HostHeaderName))
             {
-                AddHeader("Host", _options.Uri.Host);
+                AddOrChangeHeader(HostHeaderName, _options.Uri.Host);
             }
         }
     }

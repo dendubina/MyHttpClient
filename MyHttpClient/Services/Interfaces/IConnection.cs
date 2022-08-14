@@ -3,7 +3,7 @@ using System.IO;
 
 namespace MyHttpClientProject.Services.Interfaces
 {
-    public interface IClient
+    public interface IConnection
     {
         Stream GetStream();
         bool IsConnected(string address, ushort port);

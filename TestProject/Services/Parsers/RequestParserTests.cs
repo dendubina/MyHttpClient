@@ -8,7 +8,7 @@ using MyHttpClientProject.Models;
 using MyHttpClientProject.Services.Parsers;
 using Xunit;
 
-namespace TestProject.Services.Parsers
+namespace MyHttpClientProject.Tests.Services.Parsers
 {
     public class RequestParserTests
     {
@@ -33,7 +33,7 @@ namespace TestProject.Services.Parsers
         public void ParseToHttpRequestBytes_Should_ThrowException_When_Parameter_Null()
         {
             //Act
-            Action act = () => RequestParser.ParseToHttpRequestBytes(null);
+            Action act = () => RequestConvertor.ParseToHttpRequestBytes(null);
 
             //Assert
             act.Should().Throw<ArgumentNullException>();
@@ -46,7 +46,7 @@ namespace TestProject.Services.Parsers
             _options.Method = null;
 
             //Act
-            Action act = () => RequestParser.ParseToHttpRequestBytes(_options);
+            Action act = () => RequestConvertor.ParseToHttpRequestBytes(_options);
 
             //Assert
             act.Should().Throw<ArgumentNullException>();
@@ -59,7 +59,7 @@ namespace TestProject.Services.Parsers
             _options.Uri = null;
 
             //Act
-            Action act = () => RequestParser.ParseToHttpRequestBytes(_options);
+            Action act = () => RequestConvertor.ParseToHttpRequestBytes(_options);
 
             //Assert
             act.Should().Throw<ArgumentNullException>();
@@ -72,7 +72,7 @@ namespace TestProject.Services.Parsers
             _options.Headers = null;
 
             //Act
-            Action act = () => RequestParser.ParseToHttpRequestBytes(_options);
+            Action act = () => RequestConvertor.ParseToHttpRequestBytes(_options);
 
             //Assert
             act.Should().Throw<ArgumentNullException>();
@@ -96,7 +96,7 @@ namespace TestProject.Services.Parsers
             _options.Headers.Add("Content-Type", "text/plain; charset=utf-8");
 
             //Act
-            var actual = RequestParser.ParseToHttpRequestBytes(_options);
+            var actual = RequestConvertor.ParseToHttpRequestBytes(_options);
 
             //Assert
             actual.Should().Equal(Encoding.UTF8.GetBytes(expected));
@@ -111,7 +111,7 @@ namespace TestProject.Services.Parsers
                               $"{Environment.NewLine}";
 
             //Act
-            var actual = RequestParser.ParseToHttpRequestBytes(_options);
+            var actual = RequestConvertor.ParseToHttpRequestBytes(_options);
 
             //Assert
             actual.Should().Equal(Encoding.UTF8.GetBytes(expected));
