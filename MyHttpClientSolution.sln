@@ -5,9 +5,7 @@ VisualStudioVersion = 16.0.32228.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHttpClientProject", "MyHttpClient\MyHttpClientProject.csproj", "{D056544E-701B-4F15-9164-3C7494000B52}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppForUsingClient", "AppForUsingClient\AppForUsingClient.csproj", "{B72A6C26-DA89-4304-911D-AB0DD8D454BC}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHttpClientProject.Tests", "TestProject\MyHttpClientProject.Tests.csproj", "{B32695C5-83FE-49BC-A27A-6AC537439043}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHttpClientProject.Tests", "MyHttpClient.Tests\MyHttpClientProject.Tests.csproj", "{B32695C5-83FE-49BC-A27A-6AC537439043}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +17,6 @@ Global
 		{D056544E-701B-4F15-9164-3C7494000B52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D056544E-701B-4F15-9164-3C7494000B52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D056544E-701B-4F15-9164-3C7494000B52}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B72A6C26-DA89-4304-911D-AB0DD8D454BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B72A6C26-DA89-4304-911D-AB0DD8D454BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B72A6C26-DA89-4304-911D-AB0DD8D454BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B72A6C26-DA89-4304-911D-AB0DD8D454BC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B32695C5-83FE-49BC-A27A-6AC537439043}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B32695C5-83FE-49BC-A27A-6AC537439043}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B32695C5-83FE-49BC-A27A-6AC537439043}.Release|Any CPU.ActiveCfg = Release|Any CPU
