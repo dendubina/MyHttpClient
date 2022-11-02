@@ -5,7 +5,7 @@
 ```C#
 static async Task Main(string[] args)
         {
-            var client = new MyHttpClient();
+            using var client = new MyHttpClient();
 
             // Get request example
             var response1 = await client.GetAsync("http://google.com");
