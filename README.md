@@ -1,4 +1,4 @@
-### HTTP client implementation using raw TCP connection
+### Fluent, thread-safe HTTP client that uses only TCP connection
 
 #### Usage examples:
 
